@@ -21,7 +21,7 @@ class CNN(nn.Module):
         self.fully_cnnctd_3 = nn.Linear(512, 1)
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
-        X = X.unqueeze(1)
+        X = X.unsqueeze(1)
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
