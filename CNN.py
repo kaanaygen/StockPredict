@@ -24,7 +24,7 @@ class CNN(nn.Module):
 
 
     def get_conv_output_shape(self):
-        dummy_input = torch.zeros(1, 1, input_channels)
+        dummy_input = torch.zeros(1, 1, 668)
         output = self.conv1(dummy_input)
         output = self.conv2(output)
         output = self.conv3(output)
