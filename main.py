@@ -93,10 +93,10 @@ class runModel:
         return (X_train, X_test, y_train, y_test)
 
 
-    def train(model: nn.Module, dataloader: DataLoader, 
+    def train(self, model: nn.Module, dataloader: DataLoader, 
         loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
     
-        model.train()
+        self.cnn_model.train()
         epoch_average_losses = []
         
         for train_epoch in range(num_epochs):
@@ -113,9 +113,10 @@ class runModel:
 
         return epoch_average_losses
     
-    def test_model(model: nn.Module, dataloader: DataLoader, 
+    def test_model(self, model: nn.Module, dataloader: DataLoader, 
                     loss_func: nn.MSELoss) -> float:
-        model.eval()
+        
+        self.cnn_model.eval()
         test_loss = 0.0
         with torch.no_grad():
             for (input_vectors, scalar_label) in dataloader:
