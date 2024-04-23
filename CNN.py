@@ -14,16 +14,16 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        self.conv_output_size = self.get_conv_output_shape()
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 668))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 64)
         self.fully_cnnctd_2 = nn.Linear(64, 32)
         self.fully_cnnctd_3 = nn.Linear(32, 1)
 
 
-    def get_conv_output_shape(self, dummy_input = torch.zeros(1, 1, 668)):
+    def get_conv_output_shape(self, x):
        with torch.no_grad(): 
-            x = self.conv1(dummy_input)
+            x = self.conv1(x)
             x = self.conv2(output)
             x = self.conv3(output)
             x = self.flatten(output)
