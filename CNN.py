@@ -9,18 +9,17 @@ class CNN(nn.Module):
     def __init__(self, input_channels: int = 668):
 
         super().__init__()
-        self.conv1 = nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, stride = 1)
-        self.conv2 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, stride = 1)
-        self.conv3 = nn.Conv1d(in_channels=64, out_channels= 128, kernel_size=3, stride = 1)
-        self.conv4 = nn.Conv1d(in_channels=128, out_channels=256, kernel_size=3, stride = 1)
+        self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride = 1)
+        self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
+        self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
         with torch.no_grad():
             self.conv_output_size = self.get_conv_output_shape()
 
-        self.fully_cnnctd_1 = nn.Linear(256 * self.conv_output_size, 1024)
-        self.fully_cnnctd_2 = nn.Linear(1024, 512)
-        self.fully_cnnctd_3 = nn.Linear(512, 1)
+        self.fully_cnnctd_1 = nn.Linear(64 * self.conv_output_size, 64)
+        self.fully_cnnctd_2 = nn.Linear(64, 32)
+        self.fully_cnnctd_3 = nn.Linear(32, 1)
 
 
     def get_conv_output_shape(self):
@@ -35,8 +34,7 @@ class CNN(nn.Module):
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
-        o4 = torch.relu(self.conv4(o3))
-        o4 = self.flatten(o4)
+        o4 = self.flatten(o3)
         o5 = torch.relu(self.fully_cnnctd_1(o4))
         o6 = torch.relu(self.fully_cnnctd_2(o5))
         output = self.fully_cnnctd_3(o6)
