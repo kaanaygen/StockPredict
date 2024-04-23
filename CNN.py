@@ -46,6 +46,8 @@ class CNN(nn.Module):
                 optimizer.step()
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
                 epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
+
+        return epoch_average_losses
     
     def test_model(model: nn.Module, dataloader: DataLoader, 
                     loss_func: nn.MSELoss) -> float:
