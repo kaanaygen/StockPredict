@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 class CNN(nn.Module):
     
-    def __init__(self):
+    def __init__(self, input_channels: int = 668):
 
         super().__init__()
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, stride = 1)
@@ -14,11 +14,14 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=64, out_channels= 128, kernel_size=3, stride = 1)
         self.conv4 = nn.Conv1d(in_channels=128, out_channels=256, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
-        self.fully_cnnctd_1 = nn.Linear(256 * (668 + 4 * (-3 + 1)), 1024)
+
+        conv_output_size  = 256 * (668 - 3 - 3 - 3 - 3 + 4)
+        self.fully_cnnctd_1 = nn.Linear(conv_output_size, 1024)
         self.fully_cnnctd_2 = nn.Linear(1024, 512)
         self.fully_cnnctd_3 = nn.Linear(512, 1)
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
+        X = X.unqueeze(1)
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))

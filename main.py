@@ -99,9 +99,9 @@ class runModel:
         data = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float).unsqueeze(1)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float).unsqueeze(1)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float)
 
         train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
