@@ -112,8 +112,8 @@ class runModel:
         self.cnn_model = CNN()
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
-        self.train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
-        self.test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
+        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
 
 
 if __name__ == "__main__":
