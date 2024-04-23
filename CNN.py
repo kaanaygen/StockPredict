@@ -22,13 +22,14 @@ class CNN(nn.Module):
 
 
     def get_conv_output_shape(self, x):
+        shape = None
         with torch.no_grad(): 
             x = self.conv1(x)
-            x = self.conv2(output)
-            x = self.conv3(output)
-            x = self.flatten(output)
-        
-        return x.shape[1]
+            x = self.conv2(x)
+            x = self.conv3(x)
+            x = self.flatten(x)
+            shape = x.shape[1]
+        return shape
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
         o1 = torch.relu(self.conv1(X))
