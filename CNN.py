@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 class CNN(nn.Module):
     
-    def __init__(self, data):
+    def __init__(self):
 
         super(CNN, self).__init__()
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, stride = 1)
@@ -14,7 +14,7 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=64, out_channels= 128, kernel_size=3, stride = 1)
         self.conv4 = nn.Conv1d(in_channels=128, out_channels=256, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
-        self.fully_cnnctd_1 = nn.Linear(256 * (data.shape[1] + 4 * (-3 + 1)), 1024)
+        self.fully_cnnctd_1 = nn.Linear(256 * (668 + 4 * (-3 + 1)), 1024)
         self.fully_cnnctd_2 = nn.Linear(1024, 512)
         self.fully_cnnctd_3 = nn.Linear(512, 1)
 
@@ -29,7 +29,6 @@ class CNN(nn.Module):
         output = self.fully_cnnctd_3(o6)
         return output 
     
-    @staticmethod
     def train(model: nn.Module, dataloader: DataLoader, 
             loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
         
@@ -48,7 +47,6 @@ class CNN(nn.Module):
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
                 epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
     
-    @staticmethod
     def test_model(model: nn.Module, dataloader: DataLoader, 
                     loss_func: nn.MSELoss) -> float:
         model.eval()

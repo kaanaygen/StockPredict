@@ -79,6 +79,10 @@ class runModel:
         self.batch_size = 128
         self.learning_rate = 0.005
         self.epochs = 256
+        self.cnn_model = CNN()
+        self.CNN_loss_func = nn.MSELoss()
+        self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
+
 
 
     def split_normalize_XY(self, data):
@@ -89,16 +93,9 @@ class runModel:
         return (X_train, X_test, y_train, y_test)
 
 
-    def run(self):   
+    def run(self):           
 
-        def initializeCNN():
-            self.cnn_model = CNN()
-            self.CNN_loss_func = nn.MSELoss()
-            self.CNN_optimizer = optim.Adam(cnn_model.parameters(), lr = self.learning_rate)
-            return cnn_model
-        
-
-        data_preprocessor = Preprocess('/content/drive/My Drive/stock_predict_data')
+        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
@@ -116,8 +113,10 @@ class runModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        cnn_model = initializeCNN()
-        self.train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
-        test_loss = self.test(self.cnn_model, dataloader_test_set, self.loss_func)
 
-cnn = runModel().run()
+        self.cnn_model.train_model(train_loader, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        self.cnn_model.test_model(test_loader, self.CNN_loss_func)
+
+if __name__ == "__main__":
+    model_runner = runModel()  
+    model_runner.run()
