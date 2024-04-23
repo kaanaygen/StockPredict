@@ -27,7 +27,6 @@ class CNN(nn.Module):
         output = self.conv1(dummy_input)
         output = self.conv2(output)
         output = self.conv3(output)
-        output = self.conv4(output)
         return int(np.prod(output.size()))
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
