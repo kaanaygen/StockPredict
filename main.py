@@ -80,8 +80,7 @@ class runModel:
         self.batch_size = 64
         self.learning_rate = 0.01
         self.epochs = 10
-       
-
+    
 
     def split_normalize_XY(self, data):
         X = data.drop(columns=['Close']).values
@@ -89,7 +88,7 @@ class runModel:
         normalized_X = StandardScaler().fit_transform(X)
         X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
         return (X_train, X_test, y_train, y_test)
-    
+
 
     def run(self):           
 
