@@ -79,10 +79,7 @@ class runModel:
         self.batch_size = 128
         self.learning_rate = 0.005
         self.epochs = 256
-        self.cnn_model = CNN()
-        self.CNN_loss_func = nn.MSELoss()
-        self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
-
+       
 
 
     def split_normalize_XY(self, data):
@@ -91,42 +88,7 @@ class runModel:
         normalized_X = StandardScaler().fit_transform(X)
         X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
         return (X_train, X_test, y_train, y_test)
-
-
-    def train(self, model: nn.Module, dataloader: DataLoader, 
-        loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
     
-        self.cnn_model.train()
-        epoch_average_losses = []
-        
-        for train_epoch in range(num_epochs):
-            running_epoch_loss = 0.0
-            
-            for X_b, Y_b in dataloader:
-                optimizer.zero_grad()
-                batch_prediction = model.forward(X_b)
-                batch_loss = loss_func(batch_prediction, Y_b)
-                batch_loss.backward()
-                optimizer.step()
-                running_epoch_loss += batch_loss.item() * X_b.shape[0]
-                epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
-
-        return epoch_average_losses
-    
-    def test_model(self, model: nn.Module, dataloader: DataLoader, 
-                    loss_func: nn.MSELoss) -> float:
-        
-        self.cnn_model.eval()
-        test_loss = 0.0
-        with torch.no_grad():
-            for (input_vectors, scalar_label) in dataloader:
-                test_predictions = model.forward(input_vectors)
-                loss_on_test_set = loss_func(test_predictions, scalar_label)
-                test_loss += (loss_on_test_set.item() * input_vectors.shape[0]) / float(len(dataloader.dataset))
-        
-        print("Test Loss:", test_loss)
-        return test_loss  
-
 
     def run(self):           
 
@@ -147,8 +109,12 @@ class runModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
-        self.test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
+        self.cnn_model = CNN()
+        self.CNN_loss_func = nn.MSELoss()
+        self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
+        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
+
 
 if __name__ == "__main__":
     model_runner = runModel()  
