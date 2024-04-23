@@ -59,14 +59,14 @@ class Preprocess:
 
         working_data = working_data.merge(filtered_companies, on='Symbol', how='left')
         working_data = working_data.dropna()
-        self.working_data_final = pd.get_dummies(working_data, columns=['Symbol', 'Exchange', 'Sector', 'Industry'])
+        self.working_data_final = pd.get_dummies(working_data, columns=['Symbol', 'Exchange', 'Sector', 'Industry'], dtype = float)
         self.working_data_final['Date'] = pd.to_datetime(self.working_data_final['Date'], format='%Y-%m-%d')
 
         self.working_data_final['Year'] = self.working_data_final['Date'].dt.year
         self.working_data_final['Month'] = self.working_data_final['Date'].dt.month
         self.working_data_final['Day_of_Week'] = self.working_data_final['Date'].dt.dayofweek  # Monday=0, Sunday=6
 
-        self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'])
+        self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = float)
 
         self.working_data_final.drop(columns=['Date'], inplace=True)
 
@@ -90,18 +90,20 @@ class runModel:
 
 
     def run(self):   
-        
+
         def initializeCNN():
             self.cnn_model = CNN()
-            self.CNN_loss_func = nn.MSELoss
+            self.CNN_loss_func = nn.MSELoss()
             self.CNN_optimizer = optim.Adam(cnn_model.parameters(), lr = self.learning_rate)
             return cnn_model
         
-        data_preprocessor = Preprocess('/Users/kaanaygen/Desktop/StockPredict/stock_predict/data')
+
+        data_preprocessor = Preprocess('/content/drive/My Drive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
-        
+        print(data.info())
+
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -117,6 +119,5 @@ class runModel:
         cnn_model = initializeCNN()
         self.train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
         test_loss = self.test(self.cnn_model, dataloader_test_set, self.loss_func)
-        print(test_loss)
 
 cnn = runModel().run()
