@@ -65,7 +65,7 @@ class Preprocess:
 
         self.working_data_final['Year'] = self.working_data_final['Date'].dt.year
         self.working_data_final['Month'] = self.working_data_final['Date'].dt.month
-        self.working_data_final['Day_of_Week'] = self.working_data_final['Date'].dt.dayofweek  # Monday=0, Sunday=6
+        self.working_data_final['Day_of_Week'] = self.working_data_final['Date'].dt.dayofweek 
 
         self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
 
@@ -99,8 +99,8 @@ class runModel:
         data = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
 
