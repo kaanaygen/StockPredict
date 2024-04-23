@@ -77,9 +77,9 @@ class Preprocess:
 class runModel:
 
     def __init__(self):
-        self.batch_size = 128
-        self.learning_rate = 0.005
-        self.epochs = 256
+        self.batch_size = 64
+        self.learning_rate = 0.01
+        self.epochs = 10
        
 
 
@@ -107,7 +107,7 @@ class runModel:
         train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_y_test)
 
-        dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+        dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=4)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
         self.cnn_model = CNN().float()
