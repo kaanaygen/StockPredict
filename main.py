@@ -59,14 +59,14 @@ class Preprocess:
 
         working_data = working_data.merge(filtered_companies, on='Symbol', how='left')
         working_data = working_data.dropna()
-        self.working_data_final = pd.get_dummies(working_data, columns=['Symbol', 'Exchange', 'Sector', 'Industry'], dtype = float)
+        self.working_data_final = pd.get_dummies(working_data, columns=['Symbol', 'Exchange', 'Sector', 'Industry'], dtype = np.float16)
         self.working_data_final['Date'] = pd.to_datetime(self.working_data_final['Date'], format='%Y-%m-%d')
 
         self.working_data_final['Year'] = self.working_data_final['Date'].dt.year
         self.working_data_final['Month'] = self.working_data_final['Date'].dt.month
         self.working_data_final['Day_of_Week'] = self.working_data_final['Date'].dt.dayofweek  # Monday=0, Sunday=6
 
-        self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = float)
+        self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
 
         self.working_data_final.drop(columns=['Date'], inplace=True)
 
@@ -95,7 +95,7 @@ class runModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
+        data_preprocessor = Preprocess( '/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
