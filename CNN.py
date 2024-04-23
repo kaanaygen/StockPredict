@@ -8,7 +8,7 @@ class CNN(nn.Module):
     
     def __init__(self):
 
-        super(CNN, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, stride = 1)
         self.conv3 = nn.Conv1d(in_channels=64, out_channels= 128, kernel_size=3, stride = 1)
@@ -29,9 +29,11 @@ class CNN(nn.Module):
         output = self.fully_cnnctd_3(o6)
         return output 
     
-    def train(model: nn.Module, dataloader: DataLoader, 
-            loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
-        
+
+
+def train(model: nn.Module, dataloader: DataLoader, 
+        loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
+    
         model.train()
         epoch_average_losses = []
         
@@ -48,21 +50,20 @@ class CNN(nn.Module):
                 epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
 
         return epoch_average_losses
+
+
+
+def test_model(model: nn.Module, dataloader: DataLoader, 
+                loss_func: nn.MSELoss) -> float:
     
-    def test_model(model: nn.Module, dataloader: DataLoader, 
-                    loss_func: nn.MSELoss) -> float:
-        model.eval()
-        test_loss = 0.0
-        with torch.no_grad():
-            for (input_vectors, scalar_label) in dataloader:
-                test_predictions = model.forward(input_vectors)
-                loss_on_test_set = loss_func(test_predictions, scalar_label)
-                test_loss += (loss_on_test_set.item() * input_vectors.shape[0]) / float(len(dataloader.dataset))
-        
-        print("Test Loss:", test_loss)
-        return test_loss  
-
-
-
-
+    model.eval()
+    test_loss = 0.0
+    with torch.no_grad():
+        for (input_vectors, scalar_label) in dataloader:
+            test_predictions = model.forward(input_vectors)
+            loss_on_test_set = loss_func(test_predictions, scalar_label)
+            test_loss += (loss_on_test_set.item() * input_vectors.shape[0]) / float(len(dataloader.dataset))
+    
+    print("Test Loss:", test_loss)
+    return test_loss  
 
