@@ -114,8 +114,8 @@ class runModel:
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
 
-        self.cnn_model.train(train_loader, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
-        self.cnn_model.test_model(test_loader, self.CNN_loss_func)
+        self.cnn_model.train(dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        self.cnn_model.test_model(dataloader_test_set, self.CNN_loss_func)
 
 if __name__ == "__main__":
     model_runner = runModel()  
