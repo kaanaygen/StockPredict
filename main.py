@@ -102,10 +102,10 @@ class runModel:
         print(data.info())
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
-        tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
-        tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float16)
+        tensor_y_train = torch.tensor(y_train, dtype=torch.float16)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float16)
+        tensor_y_test = torch.tensor(y_test, dtype=torch.float16)
 
         train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_y_test)
