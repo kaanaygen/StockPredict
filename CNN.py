@@ -14,8 +14,7 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        with torch.no_grad():
-            self.conv_output_size = self.get_conv_output_shape()
+        self.conv_output_size = self.get_conv_output_shape()
 
         self.fully_cnnctd_1 = nn.Linear(64 * self.conv_output_size, 64)
         self.fully_cnnctd_2 = nn.Linear(64, 32)
@@ -27,7 +26,8 @@ class CNN(nn.Module):
         output = self.conv1(dummy_input)
         output = self.conv2(output)
         output = self.conv3(output)
-        return int(np.prod(output.size()))
+        output = self.flatten(output)
+        return output.numel()
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
         o1 = torch.relu(self.conv1(X))
