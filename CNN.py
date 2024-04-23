@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 class CNN(nn.Module):
     
-    def __init__(self, input_channels: int = 668):
+    def __init__(self, input_channels: int = 667):
 
         super().__init__()
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride = 1)
@@ -14,7 +14,7 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 668))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 667))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 64)
         self.fully_cnnctd_2 = nn.Linear(64, 32)
