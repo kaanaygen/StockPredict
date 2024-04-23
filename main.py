@@ -93,13 +93,46 @@ class runModel:
         return (X_train, X_test, y_train, y_test)
 
 
+    def train(model: nn.Module, dataloader: DataLoader, 
+        loss_func: nn.MSELoss, optimizer: torch.optim, num_epochs: int ) -> list[float]:
+    
+        model.train()
+        epoch_average_losses = []
+        
+        for train_epoch in range(num_epochs):
+            running_epoch_loss = 0.0
+            
+            for X_b, Y_b in dataloader:
+                optimizer.zero_grad()
+                batch_prediction = model.forward(X_b)
+                batch_loss = loss_func(batch_prediction, Y_b)
+                batch_loss.backward()
+                optimizer.step()
+                running_epoch_loss += batch_loss.item() * X_b.shape[0]
+                epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
+
+        return epoch_average_losses
+    
+    def test_model(model: nn.Module, dataloader: DataLoader, 
+                    loss_func: nn.MSELoss) -> float:
+        model.eval()
+        test_loss = 0.0
+        with torch.no_grad():
+            for (input_vectors, scalar_label) in dataloader:
+                test_predictions = model.forward(input_vectors)
+                loss_on_test_set = loss_func(test_predictions, scalar_label)
+                test_loss += (loss_on_test_set.item() * input_vectors.shape[0]) / float(len(dataloader.dataset))
+        
+        print("Test Loss:", test_loss)
+        return test_loss  
+
+
     def run(self):           
 
         data_preprocessor = Preprocess( '/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
-        print(data.info())
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float16)
@@ -113,9 +146,8 @@ class runModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-
-        self.cnn_model.train(dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
-        self.cnn_model.test_model(dataloader_test_set, self.CNN_loss_func)
+        self.train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        self.test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
 
 if __name__ == "__main__":
     model_runner = runModel()  
