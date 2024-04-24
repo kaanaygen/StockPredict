@@ -92,7 +92,7 @@ class runModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess( '/Users/kaanaygen/Desktop/ClosingPrice/StockPredict/data')
+        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
