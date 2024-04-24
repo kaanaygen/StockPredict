@@ -81,7 +81,7 @@ class runCNNModel:
     def __init__(self):
         self.batch_size = 64
         self.learning_rate = 0.001
-        self.epochs = 10
+        self.epochs = 25
     
 
     def split_normalize_XY(self, data):
