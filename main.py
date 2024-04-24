@@ -166,5 +166,5 @@ class runDNNModel:
 
 
 if __name__ == "__main__":
-    model_runner = runDNNModel()  
+    model_runner = runCNNModel()  
     model_runner.run()
