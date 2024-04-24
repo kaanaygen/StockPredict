@@ -9,7 +9,7 @@ import torch.optim.lr_scheduler
 class DNN(nn.Module):
     def __init__(self):
         super().__init__()
-        self.hidden_layers_size = [512, 256, 128, 64]
+        self.hidden_layers_size = [1024, 512, 256, 128, 64]
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(667, self.hidden_layers_size[0]))
         self.layers.append(nn.ReLU())
