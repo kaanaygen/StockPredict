@@ -61,9 +61,11 @@ def train(model: nn.Module, dataloader: DataLoader,
                 batch_loss.backward()
                 optimizer.step()
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
-                progress_bar.set_postfix({'loss': running_epoch_loss / (i + 1) * len(X_b)})
-            epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
-            print(f"Epoch: {train_epoch + 1} | Loss: {running_epoch_loss / len(dataloader.dataset):.4f}")
+                progress_bar.set_postfix(loss=(running_epoch_loss / ((i + 1) * X_b.shape[0])))
+
+            epoch_loss = running_epoch_loss / len(dataloader.dataset)
+            epoch_average_losses.append(epoch_loss)
+            print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
 
         return epoch_average_losses
 
