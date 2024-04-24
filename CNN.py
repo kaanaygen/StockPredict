@@ -52,13 +52,14 @@ class CNN(nn.Module):
 
 
 def train(model: nn.Module, dataloader: DataLoader, 
-        loss_func: nn.MSELoss, optimizer: torch.optim,  num_epochs: int ) -> list[float]:
+        loss_func: nn.MSELoss, optimizer: torch.optim, lr_scheduler: optim.lr_scheduler, num_epochs: int ) -> list[float]:
     
         model.train()
         epoch_average_losses = []
         
         for train_epoch in range(num_epochs):
             running_epoch_loss = 0.0
+            total_samples_processed = 0
             progress_bar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {train_epoch + 1}/{num_epochs}")
 
             for i, (X_b, Y_b) in progress_bar:
@@ -68,10 +69,16 @@ def train(model: nn.Module, dataloader: DataLoader,
                 batch_loss.backward()
                 optimizer.step()
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
-                progress_bar.set_postfix(loss=(running_epoch_loss / ((i + 1) * X_b.shape[0])))
+                total_samples_processed += X_b.shape[0]
+                progress_bar.set_postfix(loss=(running_epoch_loss / total_samples_processed))
+
 
             epoch_loss = running_epoch_loss / len(dataloader.dataset)
             epoch_average_losses.append(epoch_loss)
+            
+            if lr_scheduler is not None:
+                lr_scheduler.step()
+           
             print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
 
         return epoch_average_losses

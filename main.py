@@ -115,7 +115,7 @@ class runCNNModel:
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
 
-        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.epochs)
+        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, None, self.epochs)
         test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
 
 class runDNNModel:
@@ -155,8 +155,10 @@ class runDNNModel:
         self.dnn_model = DNN()
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr = self.learning_rate)
+        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience= 2)
 
-        train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.epochs)
+
+        train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
         test_model(self.dnn_model, dataloader_test_set, self.DNN_loss_func)
 
 
