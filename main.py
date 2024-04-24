@@ -72,7 +72,7 @@ class Preprocess:
         self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
 
         self.working_data_final.drop(columns=['Date'], inplace=True)
-        print(self.working_data_final.shape)
+        print(self.working_data_final.columns)
 
     def get_preprocessed_data(self):
         return self.working_data_final
