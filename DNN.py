@@ -14,7 +14,7 @@ class DNN(nn.Module):
         self.layers.append(nn.Linear(667, self.hidden_layers_size[0]))
         self.layers.append(nn.ReLU())
 
-        for layer in range(1, len(hidden_layers_size)):
+        for layer in range(1, len(self.hidden_layers_size)):
             self.layers.append(nn.Linear(self.hidden_layers_size[i-1], self.hidden_layers_size[i]))
             self.layers.append(nn.ReLU())
         
