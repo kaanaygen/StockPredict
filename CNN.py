@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn 
 import torch.optim as optim 
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm import tqdm
 
 class CNN(nn.Module):
     
@@ -51,7 +52,8 @@ def train(model: nn.Module, dataloader: DataLoader,
         
         for train_epoch in range(num_epochs):
             running_epoch_loss = 0.0
-            
+            progress_bar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {train_epoch + 1}/{num_epochs}")
+
             for X_b, Y_b in dataloader:
                 optimizer.zero_grad()
                 batch_prediction = model.forward(X_b)
@@ -59,9 +61,9 @@ def train(model: nn.Module, dataloader: DataLoader,
                 batch_loss.backward()
                 optimizer.step()
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
-                epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
-
-            print("Epoch: {} | Loss: {:.4f} ".format(train_epoch, running_epoch_loss / len(dataloader.dataset)), end="",)
+                progress_bar.set_postfix({'loss': running_epoch_loss / (i + 1) * len(X_b)})
+            epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
+            print(f"Epoch: {train_epoch + 1} | Loss: {running_epoch_loss / len(dataloader.dataset):.4f}")
 
         return epoch_average_losses
 
