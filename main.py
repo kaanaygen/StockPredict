@@ -115,6 +115,8 @@ class runCNNModel:
         self.cnn_model = CNN().float()
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
+        self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 5)
+
 
         train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, None, self.epochs)
         test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
