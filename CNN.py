@@ -61,6 +61,8 @@ def train(model: nn.Module, dataloader: DataLoader,
                 running_epoch_loss += batch_loss.item() * X_b.shape[0]
                 epoch_average_losses.append(running_epoch_loss / len(dataloader.dataset))
 
+            print("Epoch: {} | Loss: {:.4f} ".format(train_epoch, running_epoch_loss / len(dataloader.dataset)), end="",)
+
         return epoch_average_losses
 
 
