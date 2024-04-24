@@ -54,7 +54,7 @@ def train(model: nn.Module, dataloader: DataLoader,
             running_epoch_loss = 0.0
             progress_bar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {train_epoch + 1}/{num_epochs}")
 
-            for X_b, Y_b in dataloader:
+            for i, (X_b, Y_b) in progress_bar:
                 optimizer.zero_grad()
                 batch_prediction = model.forward(X_b)
                 batch_loss = loss_func(batch_prediction, Y_b)
