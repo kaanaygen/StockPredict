@@ -77,7 +77,7 @@ def train(model: nn.Module, dataloader: DataLoader,
             epoch_average_losses.append(epoch_loss)
             
             if lr_scheduler is not None:
-                lr_scheduler.step()
+                lr_scheduler.step(epoch_loss)
            
             print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
 
