@@ -121,9 +121,9 @@ class runCNNModel:
 class runDNNModel:
 
     def __init__(self):
-        self.batch_size = 64
-        self.learning_rate = 0.001
-        self.epochs = 10
+        self.batch_size = 128
+        self.learning_rate = 0.01
+        self.epochs = 30
     
     def split_normalize_XY(self, data):
         X = data.drop(columns=['Close']).values
