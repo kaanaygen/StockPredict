@@ -22,8 +22,8 @@ class DNN(nn.Module):
 
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
-        a_i = None
+        a_i = X
         for layer in self.layers:
-            a_i = layer(x)
+            a_i = layer(a_i)
         output = a_i
         return output
