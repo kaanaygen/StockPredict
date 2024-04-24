@@ -19,9 +19,11 @@ class CNN(nn.Module):
 
         self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 667))
 
-        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 64)
-        self.fully_cnnctd_2 = nn.Linear(64, 32)
-        self.fully_cnnctd_3 = nn.Linear(32, 1)
+        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 1024)
+        self.fully_cnnctd_2 = nn.Linear(1024, 512)
+        self.fully_cnnctd_3 = nn.Linear(512, 256)
+        self.fully_cnnctd_4 = nn.Linear(256, 128)
+        self.fully_cnnctd_5 = nn.Linear(128, 1)
 
 
     def get_conv_output_shape(self, x):
@@ -41,7 +43,10 @@ class CNN(nn.Module):
         o4 = self.flatten(o3)
         o5 = torch.relu(self.fully_cnnctd_1(o4))
         o6 = torch.relu(self.fully_cnnctd_2(o5))
-        output = self.fully_cnnctd_3(o6)
+        o7 = torch.relu(self.fully_cnnctd_3(o6))
+        o8 = torch.relu(self.fully_cnnctd_4(o7))
+        o9 = torch.relu(self.fully_cnnctd_5(o8))
+        output = o9
         return output 
     
 
