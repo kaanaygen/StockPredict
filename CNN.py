@@ -19,11 +19,11 @@ class CNN(nn.Module):
 
         self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 667))
 
-        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 1024)
-        self.fully_cnnctd_2 = nn.Linear(1024, 512)
-        self.fully_cnnctd_3 = nn.Linear(512, 256)
-        self.fully_cnnctd_4 = nn.Linear(256, 128)
-        self.fully_cnnctd_5 = nn.Linear(128, 1)
+        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512)
+        self.fully_cnnctd_2 = nn.Linear(512, 256)
+        self.fully_cnnctd_3 = nn.Linear(256, 128)
+        self.fully_cnnctd_4 = nn.Linear(128, 64)
+        self.fully_cnnctd_5 = nn.Linear(64, 1)
 
 
     def get_conv_output_shape(self, x):
