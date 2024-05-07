@@ -38,8 +38,12 @@ class Preprocess:
         days_nyse_open = days_nyse_open.tz_localize(None).normalize().date
         days_nyse_open_timeSeries = pd.Series(days_nyse_open)
         """
-        self.tickerData = pd.read_csv('/content/drive/MyDrive/tickers_Data.csv')
-        self.priceData = pd.read_csv('/content/drive/MyDrive/prices_Data.csv')
+        ticker_file = [f for f in os.listdir('/content/drive/MyDrive/tickers_Data') if f.endswith('.csv')][0]
+        price_file = [f for f in os.listdir('/content/drive/MyDrive/prices_Data') if f.endswith('.csv')][0]
+
+        self.tickerData = pd.read_csv(f'/content/drive/MyDrive/tickers_Data/{ticker_file}')
+        self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
+
 
         print(self.EOD_prices.shape)
         data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
