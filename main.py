@@ -46,7 +46,8 @@ class Preprocess:
 
 
         print(self.tickerData.shape)
-        data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
+        print(self.priceData.shape)
+        self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
         ticker_to_int, unique_tickers = pd.factorize(data['ticker'])
         data['ticker_encoded'] = ticker_to_int
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
