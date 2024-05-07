@@ -40,21 +40,27 @@ class Preprocess:
         """
         ticker_file = [f for f in os.listdir('/content/drive/MyDrive/tickers_Data') if f.endswith('.csv')][0]
         price_file = [f for f in os.listdir('/content/drive/MyDrive/prices_Data') if f.endswith('.csv')][0]
-
         self.tickerData = pd.read_csv(f'/content/drive/MyDrive/tickers_Data/{ticker_file}')
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
-
-
-        print(self.tickerData.shape)
-        print(self.priceData.shape)
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
+        
         ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
         self.data['ticker_encoded'] = ticker_to_int
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
-        print(self.data.shape)
+        self.data.drop(columns=['ticker'], inplace=True)
+        
+        self.data['date'] = pd.to_datetime(self.data['date'], format='%Y-%m-%d')
+        self.data['year'] = self.data['date'].dt.year
+        self.data['month'] = self.data['date'].dt.month
+        self.data['day_of_week'] = self.data['date'].dt.dayofweek 
+        self.data.drop(columns = ['date'], inplace=True)
+        self.data = pd.get_dummies(self.data, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
 
-    def get_preprocessed_data(self):
-        return self.working_data_final
+        self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
+        self.data.drop(columns=['company_name'])
+
+        
+        print(self.data.head(5))
 
 class runCNNModel:
 
