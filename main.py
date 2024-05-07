@@ -60,7 +60,7 @@ class Preprocess:
         self.data.drop(columns=['company_name'])
 
         
-        print(self.data.head(5))
+        print(self.data.columns)
 
 class runCNNModel:
 
