@@ -45,7 +45,7 @@ class Preprocess:
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
 
 
-        print(self.EOD_prices.shape)
+        print(self.tickerData.shape)
         data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
         ticker_to_int, unique_tickers = pd.factorize(data['ticker'])
         data['ticker_encoded'] = ticker_to_int
