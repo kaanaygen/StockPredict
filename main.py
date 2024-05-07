@@ -1,4 +1,6 @@
 import os
+import nasdaqdatalink
+import zipfile
 import numpy as np 
 import pandas as pd
 import torch 
@@ -15,64 +17,36 @@ from CNN import train, test_model
 
 class Preprocess:
 
-    def __init__(self, path_to_dataset):
-        
-        self.sp500_index_price_data = None 
-        self.sp500_companies_data = None 
-        self.sp500_companies_stock_price_data = None
-        self.path_to_dataset = path_to_dataset
-
-    def load_data(self):
-                
-        for dirname, _, filenames in os.walk(self.path_to_dataset):
-            for filename in filenames:
-                data_path = os.path.join(dirname, filename)
-                if filename == 'sp500_stocks.csv':
-                    self.sp500_companies_stock_price_data = data_path
-                if filename == 'sp500_companies.csv':
-                    self.sp500_companies_data = data_path
-                if filename == 'sp500_index.csv':
-                    self.sp500_index_price_data = data_path
-
+    def __init__(self, api_key):
+        nasdaqdatalink.ApiConfig.api_key = api_key
+        self.EOD_tickers = None 
+        self.EOD_prices = None 
+       
+    def load_data(self, tickers_table, prices_table):
+        self.EOD_tickers = nasdaqdatalink.export_table(tickers_table, filename = '/content/drive/MyDrive/Dset1.zip')
+        self.EOD_prices = nasdaqdatalink.export_table(prices_table, filename = '/content/drive/MyDrive/Dset2.zip')
+        with zipfile.ZipFile('/content/drive/MyDrive/Dset1.zip', 'r') as zip_ref:
+            zip_ref.extractall('/content/drive/MyDrive/tickers_Data')
+        with zipfile.ZipFile('/content/drive/MyDrive/Dset2.zip', 'r') as zip_ref:
+            zip_ref.extractall('/content/drive/MyDrive/prices_Data')            
     def data_preprocess(self):
         
-        stocks = pd.read_csv(self.sp500_companies_stock_price_data, parse_dates= ['Date'])
-        index = pd.read_csv(self.sp500_index_price_data, parse_dates= ['Date'])
-        companies = pd.read_csv(self.sp500_companies_data)
-        stocks['Date'] = pd.to_datetime(stocks['Date']).dt.date
-        index['Date'] = pd.to_datetime(index['Date']).dt.date
-
-        start_date = max(stocks['Date'].min(), index['Date'].min())
-        end_date = min(stocks['Date'].max(), index['Date'].max())
-
+        """
         nyse_calendar = pmc.get_calendar('NYSE')
         nyse_schedule = nyse_calendar.schedule(start_date=start_date, end_date=end_date)
         days_nyse_open = pmc.date_range(nyse_schedule, frequency = '1D')
         days_nyse_open = days_nyse_open.tz_localize(None).normalize().date
         days_nyse_open_timeSeries = pd.Series(days_nyse_open)
+        """
+        self.tickerData = pd.read_csv('/content/drive/MyDrive/tickers_Data.csv')
+        self.priceData = pd.read_csv('/content/drive/MyDrive/prices_Data.csv')
 
-        filtered_stocks = stocks[stocks['Date'].isin(days_nyse_open_timeSeries)]
-        filtered_index = index[index['Date'].isin(days_nyse_open_timeSeries)]
-
-        working_data = filtered_stocks.merge(filtered_index, on='Date', how='inner')
-        working_data['Date'] = pd.to_datetime(working_data['Date']).dt.date
-
-        companies_info_req = ['Symbol', 'Exchange', 'Sector', 'Industry']
-        filtered_companies = companies[companies_info_req]
-
-        working_data = working_data.merge(filtered_companies, on='Symbol', how='left')
-        working_data = working_data.dropna()
-        self.working_data_final = pd.get_dummies(working_data, columns=['Symbol', 'Exchange', 'Sector', 'Industry'], dtype = np.float16)
-        self.working_data_final['Date'] = pd.to_datetime(self.working_data_final['Date'], format='%Y-%m-%d')
-
-        self.working_data_final['Year'] = self.working_data_final['Date'].dt.year
-        self.working_data_final['Month'] = self.working_data_final['Date'].dt.month
-        self.working_data_final['Day_of_Week'] = self.working_data_final['Date'].dt.dayofweek 
-
-        self.working_data_final = pd.get_dummies(self.working_data_final, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
-
-        self.working_data_final.drop(columns=['Date'], inplace=True)
-        print(self.working_data_final.columns)
+        print(self.EOD_prices.shape)
+        data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
+        ticker_to_int, unique_tickers = pd.factorize(data['ticker'])
+        data['ticker_encoded'] = ticker_to_int
+        self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
+        print(self.data.shape)
 
     def get_preprocessed_data(self):
         return self.working_data_final
@@ -95,8 +69,8 @@ class runCNNModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
-        data_preprocessor.load_data()
+        data_preprocessor = Preprocess('hwPz-N4Amv1UHR8j5z3C')
+        data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
 
@@ -138,8 +112,8 @@ class runDNNModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
-        data_preprocessor.load_data()
+        data_preprocessor = Preprocess('hwPz-N4Amv1UHR8j5z3C')
+        data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
         data = data_preprocessor.get_preprocessed_data()
 
