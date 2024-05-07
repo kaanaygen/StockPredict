@@ -54,7 +54,7 @@ class Preprocess:
         self.data['month'] = self.data['date'].dt.month
         self.data['day_of_week'] = self.data['date'].dt.dayofweek 
         self.data.drop(columns = ['date'], inplace=True)
-        self.data = pd.get_dummies(self.data, columns=['Year', 'Month', 'Day_of_Week'], dtype = np.float16)
+        self.data = pd.get_dummies(self.data, columns=['year', 'month', 'day_of_week'], dtype = np.float16)
 
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'])
