@@ -29,8 +29,8 @@ class Preprocess:
             zip_ref.extractall('/content/drive/MyDrive/tickers_Data')
         with zipfile.ZipFile('/content/drive/MyDrive/Dset2.zip', 'r') as zip_ref:
             zip_ref.extractall('/content/drive/MyDrive/prices_Data')            
+    
     def data_preprocess(self):
-        
         """
         nyse_calendar = pmc.get_calendar('NYSE')
         nyse_schedule = nyse_calendar.schedule(start_date=start_date, end_date=end_date)
@@ -59,9 +59,7 @@ class Preprocess:
 
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'])
-
-        
-        print(self.data.columns)
+        self.data.columns = [col.strip() for col in self.data.columns]
 
 class runCNNModel:
 
