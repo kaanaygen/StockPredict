@@ -40,16 +40,40 @@ class CNN(nn.Module):
 
     def forward(self, X: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
         embedded = self.embedding(X_tickers).unsqueeze(1)
+        print("Embedded shape:", embedded.shape)
+
+        # No need to unsqueeze X here since it's already unsqueezed in the main script
+        # Concatenate along the batch dimension (dimension 1)
         X = torch.cat((embedded, X), dim=1)
+        print("X shape after concatenation:", X.shape)
+
         o1 = torch.relu(self.conv1(X)) 
+        print("o1 shape after conv1:", o1.shape)
+
         o2 = torch.relu(self.conv2(o1))
+        print("o2 shape after conv2:", o2.shape)
+
         o3 = torch.relu(self.conv3(o2))
+        print("o3 shape after conv3:", o3.shape)
+
         o4 = self.flatten(o3)
+        print("o4 shape before fully connected layers:", o4.shape)
+
         o5 = torch.relu(self.fully_cnnctd_1(o4))
+        print("o5 shape after fully connected layer 1:", o5.shape)
+
         o6 = torch.relu(self.fully_cnnctd_2(o5))
+        print("o6 shape after fully connected layer 2:", o6.shape)
+
         o7 = torch.relu(self.fully_cnnctd_3(o6))
+        print("o7 shape after fully connected layer 3:", o7.shape)
+
         o8 = torch.relu(self.fully_cnnctd_4(o7))
+        print("o8 shape after fully connected layer 4:", o8.shape)
+
         o9 = torch.relu(self.fully_cnnctd_5(o8))
+        print("o9 shape after fully connected layer 5:", o9.shape)
+
         output = o9
         return output 
     
