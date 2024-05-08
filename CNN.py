@@ -12,14 +12,14 @@ class CNN(nn.Module):
     def __init__(self, num_tickers, num_features):
 
         super().__init__()
-        self.embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=33)
+        self.embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=num_tickers)
 
-        self.conv1 = nn.Conv1d(in_channels= 33 + num_features, out_channels=16, kernel_size=3, stride = 1)
+        self.conv1 = nn.Conv1d(in_channels= num_tickers + num_features, out_channels=16, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 66, 34))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, num_tickers + num_features, 34))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512)
         self.fully_cnnctd_2 = nn.Linear(512, 256)
