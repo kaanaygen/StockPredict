@@ -115,7 +115,7 @@ class runCNNModel:
 
         self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data().shape[1])
         self.CNN_loss_func = nn.MSELoss()
-        self.CNN_optimizer = optim.SGD(model.parameters(), lr=self.learning_rate, momentum=0.9)
+        self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
 
 
