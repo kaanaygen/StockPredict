@@ -44,7 +44,7 @@ class Preprocess:
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
         
-        ticker_to_int, self.unique_tickers = pd.factorize(self.data['ticker'])
+        ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
         self.data['ticker_encoded'] = ticker_to_int
         self.ticker_encoded = self.data['ticker_encoded'].values
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
