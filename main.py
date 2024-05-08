@@ -87,7 +87,7 @@ class runCNNModel:
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
-        max_ticker_index = torch.max(torch.tensor(tickers))
+        max_ticker_index = torch.max(torch.tensor(tickers)).item()
 
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
