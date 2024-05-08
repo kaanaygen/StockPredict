@@ -44,7 +44,7 @@ class CNN(nn.Module):
 
         # No need to unsqueeze X here since it's already unsqueezed in the main script
         # Concatenate along the batch dimension (dimension 1)
-        X = torch.cat((X, embedded), dim=2)
+        X = torch.cat((X, embedded), dim=1)
         print("X shape after concatenation:", X.shape)
 
         o1 = torch.relu(self.conv1(X)) 
