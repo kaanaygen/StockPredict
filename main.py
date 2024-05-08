@@ -87,6 +87,8 @@ class runCNNModel:
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
+        max_ticker_index = torch.max(torch.tensor(tickers))
+
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
 
@@ -113,7 +115,7 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), dataSet.columns.shape[0])
+        self.cnn_model = CNN(max_ticker_index + 1, dataSet.columns.shape[0])
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
