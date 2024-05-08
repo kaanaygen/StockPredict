@@ -9,15 +9,17 @@ import torch.optim.lr_scheduler
 
 class CNN(nn.Module):
     
-    def __init__(self):
+    def __init__(self, unique_tickers):
 
         super().__init__()
-        self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride = 1)
+        self.embedding = nn.Embedding(num_embeddings=unique_tickers, embedding_dim=20)
+
+        self.conv1 = nn.Conv1d(in_channels=20, out_channels=16, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1, 34))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 20, 34))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512)
         self.fully_cnnctd_2 = nn.Linear(512, 256)
@@ -36,7 +38,10 @@ class CNN(nn.Module):
             shape = x.shape[1]
         return shape
 
-    def forward(self, X: torch.Tensor) -> torch.Tensor:
+    def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
+        embedded = self.embedding(X_tickers).permute(0, 2, 1)  
+        X = torch.cat((embedded, X), dim=1)  
+
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
@@ -52,36 +57,36 @@ class CNN(nn.Module):
 
 
 def train(model: nn.Module, dataloader: DataLoader, 
-        loss_func: nn.MSELoss, optimizer: torch.optim, lr_scheduler: optim.lr_scheduler, num_epochs: int ) -> list[float]:
+          loss_func: nn.MSELoss, optimizer: torch.optim, 
+          lr_scheduler: optim.lr_scheduler, num_epochs: int) -> list[float]:
     
-        model.train()
-        epoch_average_losses = []
+    model.train()
+    epoch_average_losses = []
+    
+    for train_epoch in range(num_epochs):
+        running_epoch_loss = 0.0
+        total_samples_processed = 0
+        progress_bar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {train_epoch + 1}/{num_epochs}")
         
-        for train_epoch in range(num_epochs):
-            running_epoch_loss = 0.0
-            total_samples_processed = 0
-            progress_bar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {train_epoch + 1}/{num_epochs}")
+        for i, (X_numeric, X_ticker_indices, Y_b) in progress_bar:
+            optimizer.zero_grad()
+            batch_prediction = model(X_numeric, X_ticker_indices)
+            batch_loss = loss_func(batch_prediction, Y_b)
+            batch_loss.backward()
+            optimizer.step()
+            running_epoch_loss += batch_loss.item() * X_numeric.size(0)
+            total_samples_processed += X_numeric.size(0)
+            progress_bar.set_postfix(loss=(running_epoch_loss / total_samples_processed))
 
-            for i, (X_b, Y_b) in progress_bar:
-                optimizer.zero_grad()
-                batch_prediction = model.forward(X_b)
-                batch_loss = loss_func(batch_prediction, Y_b)
-                batch_loss.backward()
-                optimizer.step()
-                running_epoch_loss += batch_loss.item() * X_b.shape[0]
-                total_samples_processed += X_b.shape[0]
-                progress_bar.set_postfix(loss=(running_epoch_loss / total_samples_processed))
+        epoch_loss = running_epoch_loss / len(dataloader.dataset)
+        epoch_average_losses.append(epoch_loss)
+        
+        if lr_scheduler is not None:
+            lr_scheduler.step(epoch_loss)
+        
+        print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
 
-
-            epoch_loss = running_epoch_loss / len(dataloader.dataset)
-            epoch_average_losses.append(epoch_loss)
-            
-            if lr_scheduler is not None:
-                lr_scheduler.step(epoch_loss)
-           
-            print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
-
-        return epoch_average_losses
+    return epoch_average_losses
 
 
 

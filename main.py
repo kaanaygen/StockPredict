@@ -44,10 +44,11 @@ class Preprocess:
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
         
-        ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
+        ticker_to_int, self.unique_tickers = pd.factorize(self.data['ticker'])
         self.data['ticker_encoded'] = ticker_to_int
+        self.ticker_encoded = data['ticker_encoded'].values
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
-        self.data.drop(columns=['ticker'], inplace=True)
+        self.data.drop(columns=['ticker', 'ticker_encoded'], inplace=True)
         
         self.data['date'] = pd.to_datetime(self.data['date'], format='%Y-%m-%d')
         self.data['year'] = self.data['date'].dt.year
@@ -60,10 +61,13 @@ class Preprocess:
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'], inplace=True)
         self.data.columns = [col.replace(' ', '_') for col in self.data.columns]
-        print(self.data.columns)
 
     def get_preprocessed_data(self):
         return self.data
+    
+    def get_encoded_tickers(self):
+        return self.ticker_encoded
+
 
 class runCNNModel:
 
@@ -73,35 +77,40 @@ class runCNNModel:
         self.epochs = 100
     
 
-    def split_normalize_XY(self, data):
-        X = data.drop(columns=['close']).values
-        Y = data['close'].values.reshape(-1, 1)
-        normalized_X = StandardScaler().fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
-        return (X_train, X_test, y_train, y_test)
-
-
     def run(self):           
 
         data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
+        tickers = data_preprocessor.get_encoded_tickers()
+        y = dataSet['close'].values.reshape(-1, 1)  
+        dataSet.drop(columns=['close'], inplace=True)
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
-        print(X_train[0])
+        X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
+            dataSet, tickers, y, 
+            train_size=0.8, 
+            test_size=0.2, 
+            random_state=8)
+
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)  # Only transform, do not fit!
+       
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
+        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
+        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
 
-        train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
-        test_dataset = TensorDataset(tensor_X_test, tensor_y_test)
+        train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_y_train)
+        test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
 
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.cnn_model = CNN().float()
+        self.cnn_model = CNN(len(np.unique(tickers))
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
 
