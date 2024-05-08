@@ -12,7 +12,7 @@ class CNN(nn.Module):
     def __init__(self, num_tickers, num_features):
 
         super().__init__()
-        self.embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=20).unsqueeze(1)
+        self.embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=20)
 
         self.conv1 = nn.Conv1d(in_channels= 20 + num_features, out_channels=16, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
@@ -39,7 +39,7 @@ class CNN(nn.Module):
         return shape
 
     def forward(self, X: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
-        embedded = self.embedding(X_tickers).unsqueeze
+        embedded = self.embedding(X_tickers).unsqueeze(1)
         X = torch.cat((embedded, X), dim=1)
         o1 = torch.relu(self.conv1(X)) 
         o2 = torch.relu(self.conv2(o1))
