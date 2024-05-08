@@ -61,6 +61,10 @@ class Preprocess:
         self.data.drop(columns=['company_name'])
         self.data.columns = [col.replace(' ', '_') for col in self.data.columns]
 
+    def get_preprocessed_data(self):
+        return self.data
+
+
 class runCNNModel:
 
     def __init__(self):
@@ -82,8 +86,9 @@ class runCNNModel:
         data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
+        dataSet = data_preprocessor.get_preprocessed_data()
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(self.data)
+        X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -124,8 +129,10 @@ class runDNNModel:
         data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
+        dataSet = data_preprocessor.get_preprocessed_data()
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(self.data)
+
+        X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
