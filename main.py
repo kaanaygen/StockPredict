@@ -113,7 +113,7 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data().shape[1])
+        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data().shape[1] - 1)
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
@@ -125,18 +125,11 @@ class runCNNModel:
 class runDNNModel:
 
     def __init__(self):
-        self.batch_size = 128
+        self.batch_size = 1024
         self.learning_rate = 0.01
-        self.epochs = 30
+        self.epochs = 100
     
-    def split_normalize_XY(self, data):
-        X = data.drop(columns=['close']).values
-        Y = data['close'].values.reshape(-1, 1)
-        normalized_X = StandardScaler().fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.9, test_size = 0.1 , random_state = 8)
-        return (X_train, X_test, y_train, y_test)
-
-
+   
     def run(self):           
 
         data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
@@ -144,15 +137,30 @@ class runDNNModel:
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
 
+        tickers = data_preprocessor.get_encoded_tickers()
+        y = dataSet['close'].values.reshape(-1, 1)  
+        dataSet.drop(columns=['close'], inplace=True)
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
+        X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
+            dataSet, tickers, y, 
+            train_size=0.9, 
+            test_size=0.1, 
+            random_state=8)
+
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test) 
+
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
+        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
+        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
 
-        train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
-        test_dataset = TensorDataset(tensor_X_test, tensor_y_test)
+        train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_y_train)
+        test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
+
 
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
