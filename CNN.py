@@ -14,7 +14,7 @@ class CNN(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings=unique_tickers, embedding_dim=20)
 
-        self.conv1 = nn.Conv1d(in_channels=54, out_channels=16, kernel_size=3, stride = 1)
+        self.conv1 = nn.Conv1d(in_channels=21, out_channels=16, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
@@ -40,8 +40,6 @@ class CNN(nn.Module):
 
     def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
         embedded = self.embedding(X_tickers).unsqueeze(2).permute(0, 2, 1)  
-        if X.dim() == 3 and X.shape[1] == 1:  # X has shape [batch, 1, length]
-            X = X.expand(-1, 20, -1)  # Expand X to have the same channel size as embedded
         X = torch.cat((embedded, X), dim=1)  
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
