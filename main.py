@@ -60,6 +60,7 @@ class Preprocess:
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'])
         self.data.columns = [col.strip() for col in self.data.columns]
+        print(self.data.columns)
 
 class runCNNModel:
 
@@ -79,10 +80,9 @@ class runCNNModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess('hwPz-N4Amv1UHR8j5z3C')
+        data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
-        data = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
@@ -122,10 +122,9 @@ class runDNNModel:
 
     def run(self):           
 
-        data_preprocessor = Preprocess('hwPz-N4Amv1UHR8j5z3C')
+        data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
-        data = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
