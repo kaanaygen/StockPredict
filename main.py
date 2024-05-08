@@ -59,8 +59,9 @@ class Preprocess:
 
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'])
-        self.data.columns = [col.strip() for col in self.data.columns]
+        self.data.columns = [col.replace('_', ' ') for col in data.columns]
         print(self.data.columns)
+        print(self.data.shape)
 
 class runCNNModel:
 
