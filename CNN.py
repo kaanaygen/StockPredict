@@ -19,7 +19,7 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 20, 34))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 21, 34))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512)
         self.fully_cnnctd_2 = nn.Linear(512, 256)
@@ -40,8 +40,9 @@ class CNN(nn.Module):
 
     def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
         embedded = self.embedding(X_tickers).unsqueeze(2).permute(0, 2, 1)  
+        if X.dim() == 2:
+            X = X.unsqueeze(1)  # Add channel dimension
         X = torch.cat((embedded, X), dim=1)  
-
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
