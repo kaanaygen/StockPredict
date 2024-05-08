@@ -46,7 +46,7 @@ class Preprocess:
         
         ticker_to_int, self.unique_tickers = pd.factorize(self.data['ticker'])
         self.data['ticker_encoded'] = ticker_to_int
-        self.ticker_encoded = data['ticker_encoded'].values
+        self.ticker_encoded = self.data['ticker_encoded'].values
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
         self.data.drop(columns=['ticker', 'ticker_encoded'], inplace=True)
         
