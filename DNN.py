@@ -7,11 +7,12 @@ from tqdm import tqdm
 import torch.optim.lr_scheduler
 
 class DNN(nn.Module):
-    def __init__(self):
+    def __init__(self, num_tickers, num_features):
         super().__init__()
         self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16]
+        input_size = num_tickers + num_features
         self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(667, self.hidden_layers_size[0]))
+        self.layers.append(nn.Linear(input_size, self.hidden_layers_size[0]))
         self.layers.append(nn.ReLU())
 
         for layer in range(1, len(self.hidden_layers_size)):
@@ -21,8 +22,10 @@ class DNN(nn.Module):
         self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1))
 
 
-    def forward(self, X: torch.Tensor) -> torch.Tensor:
-        a_i = X
+    def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
+        embedded_tickers = self.ticker_embedding(X_tickers)
+        combined_input = torch.cat((X_features, embedded_tickers), dim=1)
+        a_i = combined_input
         for layer in self.layers:
             a_i = layer(a_i)
         output = a_i

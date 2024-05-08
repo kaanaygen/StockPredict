@@ -151,8 +151,8 @@ class runDNNModel:
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test) 
 
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
         tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
         tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -168,7 +168,7 @@ class runDNNModel:
         self.dnn_model = DNN()
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr = self.learning_rate)
-        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 5)
+        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 2)
 
 
         train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
