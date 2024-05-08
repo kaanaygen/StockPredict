@@ -14,7 +14,7 @@ class CNN(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=20)
 
-        self.conv1 = nn.Conv1d(in_channels= num_tickers + num_features, out_channels=16, kernel_size=3, stride = 1)
+        self.conv1 = nn.Conv1d(in_channels= 20 + num_features, out_channels=16, kernel_size=3, stride = 1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1)
         self.flatten = nn.Flatten()
