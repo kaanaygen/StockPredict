@@ -39,7 +39,7 @@ class CNN(nn.Module):
         return shape
 
     def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
-        embedded = self.embedding(X_tickers).permute(0, 2, 1)  
+        embedded = self.embedding(X_tickers).unsqueeze(2).permute(0, 2, 1)  
         X = torch.cat((embedded, X), dim=1)  
 
         o1 = torch.relu(self.conv1(X))
