@@ -68,9 +68,9 @@ class Preprocess:
 class runCNNModel:
 
     def __init__(self):
-        self.batch_size = 64
+        self.batch_size = 128
         self.learning_rate = 0.001
-        self.epochs = 25
+        self.epochs = 100
     
 
     def split_normalize_XY(self, data):
@@ -89,10 +89,11 @@ class runCNNModel:
         dataSet = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
+        print(tensor_X_train.shape)
 
         train_dataset = TensorDataset(tensor_X_train, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_y_test)
