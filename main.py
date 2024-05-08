@@ -89,8 +89,8 @@ class runCNNModel:
         dataSet = data_preprocessor.get_preprocessed_data()
 
         X_train, X_test, y_train, y_test = self.split_normalize_XY(dataSet)
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
 
