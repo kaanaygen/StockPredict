@@ -38,10 +38,10 @@ class CNN(nn.Module):
             shape = x.shape[1]
         return shape
 
-    def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
-        embedded = self.embedding(X_tickers).unsqueeze(2).permute(0, 2, 1)  
-        X = torch.cat((embedded, X), dim=0)  
-        o1 = torch.relu(self.conv1(X))
+    def forward(self, X: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
+        if X.dim() == 3 and X.shape[1] == 1:  # Ensure X has shape [batch, 1, seq_length]
+            X = X.expand(-1, 20, -1)  # Expanding X to match the embedding dimension
+        X = torch.cat((embedded, X), dim=1)  # Correct dimension for concatenation        o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
         o4 = self.flatten(o3)
