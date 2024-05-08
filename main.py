@@ -138,8 +138,9 @@ class runDNNModel:
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
-
         tickers = data_preprocessor.get_encoded_tickers()
+        max_ticker_index = torch.max(torch.tensor(tickers)).item()
+
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
 
@@ -167,7 +168,7 @@ class runDNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(data_preprocessor.get_num_unique_tickers(), dataSet.columns.shape[0])
+        self.dnn_model = DNN(max_ticker_index + 1, dataSet.columns.shape[0])
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr = self.learning_rate)
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 2)
