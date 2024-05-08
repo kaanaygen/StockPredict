@@ -68,7 +68,7 @@ class Preprocess:
     def get_encoded_tickers(self):
         return self.ticker_encoded
 
-    def get_unique_tickers(self):
+    def get_num_unique_tickers(self):
         return len(self.int_to_ticker_map)
 
 
@@ -113,8 +113,8 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        print(data_preprocessor.get_unique_tickers())
-        self.cnn_model = CNN(data_preprocessor.get_unique_tickers())
+        print(data_preprocessor.get_num_unique_tickers())
+        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data.shape[1])
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
 
