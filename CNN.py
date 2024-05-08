@@ -31,6 +31,7 @@ class CNN(nn.Module):
     def get_conv_output_shape(self, x):
         shape = None
         with torch.no_grad(): 
+            x = x.unsqueeze(1)
             x = self.conv1(x)
             x = self.conv2(x)
             x = self.conv3(x)
