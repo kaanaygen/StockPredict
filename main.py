@@ -114,7 +114,7 @@ class runCNNModel:
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
         print(data_preprocessor.get_num_unique_tickers())
-        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data.shape[1])
+        self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data().shape[1])
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
 
