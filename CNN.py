@@ -40,7 +40,7 @@ class CNN(nn.Module):
 
     def forward(self, X: torch.Tensor, X_tickers) -> torch.Tensor:
         embedded = self.embedding(X_tickers).unsqueeze(2).permute(0, 2, 1)  
-        X = torch.cat((embedded, X), dim=2)  
+        X = torch.cat((embedded, X), dim=0)  
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
