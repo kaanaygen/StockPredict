@@ -76,7 +76,7 @@ class runCNNModel:
 
     def __init__(self):
         self.batch_size = 1024
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.epochs = 100
     
 
@@ -102,7 +102,6 @@ class runCNNModel:
        
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
-        print(tensor_X_train.shape)
         tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
         tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -114,13 +113,13 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        print(data_preprocessor.get_num_unique_tickers())
         self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), data_preprocessor.get_preprocessed_data().shape[1])
         self.CNN_loss_func = nn.MSELoss()
-        self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr = self.learning_rate)
+        self.CNN_optimizer = optim.SGD(model.parameters(), lr=self.learning_rate, momentum=0.9)
+        self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
 
 
-        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, None, self.epochs)
+        train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.CNN_scheduler, self.epochs)
         test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
 
 class runDNNModel:
@@ -134,7 +133,7 @@ class runDNNModel:
         X = data.drop(columns=['close']).values
         Y = data['close'].values.reshape(-1, 1)
         normalized_X = StandardScaler().fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
+        X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.9, test_size = 0.1 , random_state = 8)
         return (X_train, X_test, y_train, y_test)
 
 
