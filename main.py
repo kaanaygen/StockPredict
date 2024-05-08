@@ -113,7 +113,7 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        print(data_preprocessor.get_preprocessed_data(.shape[1]))
+        print(data_preprocessor.get_preprocessed_data().shape[1])
         self.cnn_model = CNN(data_preprocessor.get_num_unique_tickers(), dataSet.columns.shape)
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
