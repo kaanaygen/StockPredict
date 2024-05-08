@@ -60,8 +60,6 @@ class Preprocess:
         self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
         self.data.drop(columns=['company_name'])
         self.data.columns = [col.replace(' ', '_') for col in self.data.columns]
-        print(self.data.columns)
-        print(self.data.shape)
 
 class runCNNModel:
 
@@ -72,8 +70,8 @@ class runCNNModel:
     
 
     def split_normalize_XY(self, data):
-        X = data.drop(columns=['Close']).values
-        Y = data['Close'].values.reshape(-1, 1)
+        X = data.drop(columns=['close']).values
+        Y = data['close'].values.reshape(-1, 1)
         normalized_X = StandardScaler().fit_transform(X)
         X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
         return (X_train, X_test, y_train, y_test)
@@ -85,7 +83,7 @@ class runCNNModel:
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
+        X_train, X_test, y_train, y_test = self.split_normalize_XY(self.data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32).unsqueeze(1)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -114,8 +112,8 @@ class runDNNModel:
         self.epochs = 30
     
     def split_normalize_XY(self, data):
-        X = data.drop(columns=['Close']).values
-        Y = data['Close'].values.reshape(-1, 1)
+        X = data.drop(columns=['close']).values
+        Y = data['close'].values.reshape(-1, 1)
         normalized_X = StandardScaler().fit_transform(X)
         X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.8, test_size = 0.2 , random_state = 8)
         return (X_train, X_test, y_train, y_test)
@@ -127,7 +125,7 @@ class runDNNModel:
         data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
         data_preprocessor.data_preprocess()
 
-        X_train, X_test, y_train, y_test = self.split_normalize_XY(data)
+        X_train, X_test, y_train, y_test = self.split_normalize_XY(self.data)
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
