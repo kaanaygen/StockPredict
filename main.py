@@ -88,9 +88,6 @@ class runCNNModel:
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
-        num_unique_tickers = data_preprocessor.get_num_unique_tickers()
-        print("Max Ticker Index:", max_ticker_index)
-        print("Number of Unique Tickers:", num_unique_tickers)
 
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
@@ -143,6 +140,11 @@ class runDNNModel:
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
+        num_unique_tickers = data_preprocessor.get_num_unique_tickers()
+
+        print("Max Ticker Index:", max_ticker_index)
+        print("Number of Unique Tickers:", num_unique_tickers)
+
 
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
