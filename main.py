@@ -140,7 +140,7 @@ class runDNNModel:
 
     def __init__(self):
         self.batch_size = 256
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.epochs = 250
     
    
@@ -158,6 +158,9 @@ class runDNNModel:
 
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
+        scaler_y = StandardScaler()
+        y = scaler_y.fit_transform(y)
+
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
             dataSet, tickers, y, 
@@ -185,8 +188,8 @@ class runDNNModel:
 
         self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])
         self.DNN_loss_func = nn.MSELoss()
-        self.DNN_optimizer = optim.SGD(self.dnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
-        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 1)
+        self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate)
+        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 5)
 
 
         train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
