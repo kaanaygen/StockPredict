@@ -50,6 +50,16 @@ class Preprocess:
         print("Data shape after merge:", self.data.shape)
         print("Number of missing values:", self.data.isnull().sum().sum())
 
+        ticker_counts = data.groupby('ticker').size()
+
+        # You can also check how many dates each ticker has
+        date_counts = data.groupby(['ticker', 'date']).size()
+
+        # Display the distribution of count of appearances for each ticker
+        print(ticker_counts.describe())
+
+        # Check for tickers with significantly fewer entries
+        print(ticker_counts[ticker_counts < threshold])
         
         self.data.dropna(inplace=True)
         print("Data shape after dropping NAs:", self.data.shape)
