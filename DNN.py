@@ -9,7 +9,7 @@ import torch.optim.lr_scheduler
 class DNN(nn.Module):
     def __init__(self, num_tickers, num_features):
         super().__init__()
-        ticker_embedding_dim = 8
+        ticker_embedding_dim = 64
         concat_input_size = ticker_embedding_dim + num_features
         self.hidden_layers_size = [4056, 2048, 1024, 512, 256, 128, 64, 32, 16, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim)
@@ -22,6 +22,11 @@ class DNN(nn.Module):
             self.layers.append(nn.ReLU())
         
         self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1))
+
+        for layer in self.layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.kaiming_normal_(layer.weight)
+
 
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
