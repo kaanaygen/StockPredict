@@ -65,7 +65,7 @@ def train(model: nn.Module, dataloader: DataLoader,
             running_epoch_loss += batch_loss_value * batch_samples
             total_samples_processed += batch_samples
 
-            print(f"Batch {batch_index + 1}: Loss = {batch_loss_value:.4f}, Samples = {batch_samples}")
+            print(f"Batch {i + 1}: Loss = {batch_loss_value:.4f}, Samples = {batch_samples}")
         
         epoch_loss = running_epoch_loss / total_samples_processed
         epoch_average_losses.append(epoch_loss)
