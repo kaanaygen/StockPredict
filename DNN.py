@@ -11,7 +11,7 @@ class DNN(nn.Module):
         super().__init__()
         ticker_embedding_dim = 32
         concat_input_size = ticker_embedding_dim + num_features
-        self.hidden_layers_size = [512, 256, 128, 64, 32, 16, 1]
+        self.hidden_layers_size = [22310, 11000, 5500, 2250, 1125, 500, 250, 130, 65,  1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim)
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0]))
