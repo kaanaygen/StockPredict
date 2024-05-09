@@ -140,7 +140,7 @@ class runDNNModel:
 
     def __init__(self):
         self.batch_size = 256
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.01
         self.epochs = 250
     
    
@@ -186,7 +186,7 @@ class runDNNModel:
         self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.SGD(self.dnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
-        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 5)
+        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 1)
 
 
         train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
