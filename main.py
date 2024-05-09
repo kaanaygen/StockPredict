@@ -112,8 +112,8 @@ class runCNNModel:
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32).unsqueeze(1)
         tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
         tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
-        tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
-        tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
+        tensor_y_train = torch.tensor(y_train, dtype=torch.int)
+        tensor_y_test = torch.tensor(y_test, dtype=torch.int)
 
         train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
