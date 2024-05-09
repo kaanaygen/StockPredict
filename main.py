@@ -139,7 +139,7 @@ class runCNNModel:
 class runDNNModel:
 
     def __init__(self):
-        self.batch_size = 256
+        self.batch_size = 8
         self.learning_rate = 0.001
         self.epochs = 250
     
@@ -183,7 +183,7 @@ class runDNNModel:
         test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
 
 
-        dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+        dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
         self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])

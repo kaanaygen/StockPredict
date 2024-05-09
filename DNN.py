@@ -46,6 +46,7 @@ def train(model: nn.Module, dataloader: DataLoader,
     
     model.train()
     epoch_average_losses = []
+    display_interval = 100
     
     for train_epoch in range(num_epochs):
         running_epoch_loss = 0.0
@@ -65,7 +66,9 @@ def train(model: nn.Module, dataloader: DataLoader,
             running_epoch_loss += batch_loss_value * batch_samples
             total_samples_processed += batch_samples
 
-            #print(f"Batch {i + 1}: Loss = {batch_loss_value:.4f}, Samples = {batch_samples}")
+            if (i + 1) % display_interval == 0:
+                print(f"Epoch {train_epoch + 1}, Batch {i + 1}: Loss = {batch_loss_value:.4f}")
+
         
         epoch_loss = running_epoch_loss / total_samples_processed
         epoch_average_losses.append(epoch_loss)
