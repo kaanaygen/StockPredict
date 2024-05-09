@@ -179,7 +179,7 @@ class runDNNModel:
 
         self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])
         self.DNN_loss_func = nn.MSELoss()
-        self.DNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
+        self.DNN_optimizer = optim.SGD(self.dnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 5, verbose=True)
 
 
