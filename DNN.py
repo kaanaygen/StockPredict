@@ -26,8 +26,9 @@ class DNN(nn.Module):
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
         print("X_features shape:", X_features.shape)
-        print("Embedded tickers shape:", embedded_tickers.shape)
         embedded_tickers = self.ticker_embedding(X_tickers)
+        print("Embedded tickers shape:", embedded_tickers.shape)
+
         combined_input = torch.cat((X_features, embedded_tickers), dim=1)
         print("Combined input shape:", combined_input.shape)
         a_i = combined_input
