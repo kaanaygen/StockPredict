@@ -165,8 +165,8 @@ class runDNNModel:
 
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
-        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long)  
-        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long)
+        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.float32)  
+        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.float32)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
 
