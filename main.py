@@ -43,6 +43,7 @@ class Preprocess:
         self.tickerData = pd.read_csv(f'/content/drive/MyDrive/tickers_Data/{ticker_file}')
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
+        self.data.dropna(inplace=True)
         
         ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
         self.data['ticker_encoded'] = ticker_to_int
