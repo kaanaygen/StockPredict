@@ -158,8 +158,6 @@ class runDNNModel:
 
         y = dataSet['close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['close'], inplace=True)
-        scaler_y = StandardScaler()
-        y = scaler_y.fit_transform(y)
 
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
