@@ -42,12 +42,18 @@ class Preprocess:
         price_file = [f for f in os.listdir('/content/drive/MyDrive/prices_Data') if f.endswith('.csv')][0]
         self.tickerData = pd.read_csv(f'/content/drive/MyDrive/tickers_Data/{ticker_file}')
         self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
+        print("Ticker data shape before merge:", self.tickerData.shape)
+        print("Price data shape before merge:", self.priceData.shape)
+
+
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
-        full_data = self.data.shape[0]
-        print("Number of Rows before drop:", full_data)
+        print("Data shape after merge:", self.data.shape)
+        print("Number of missing values:", self.data.isnull().sum().sum())
+
+        
         self.data.dropna(inplace=True)
-        print("Number of Rows after drop:", self.data.shape[0])
-        print("Number of dropped rows:", self.data.shape[0] - full_data)
+        print("Data shape after dropping NAs:", self.data.shape)
+
 
 
         ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
