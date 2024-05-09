@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from CNN import CNN 
 from DNN import DNN 
-from CNN import train, test_model
+from DNN import train, test_model
 
 class Preprocess:
 
