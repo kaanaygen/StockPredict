@@ -11,7 +11,7 @@ class DNN(nn.Module):
         super().__init__()
         ticker_embedding_dim = num_tickers
         concat_input_size = ticker_embedding_dim + num_features
-        self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16]
+        self.hidden_layers_size = [4056, 2048, 1024, 512, 256, 128, 64, 32, 16, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers + 1, embedding_dim=ticker_embedding_dim)
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0]))
@@ -25,12 +25,9 @@ class DNN(nn.Module):
 
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
-        print("X_features shape:", X_features.shape)
         embedded_tickers = self.ticker_embedding(X_tickers)
-        print("Embedded tickers shape:", embedded_tickers.shape)
 
         combined_input = torch.cat((X_features, embedded_tickers), dim=1)
-        print("Combined input shape:", combined_input.shape)
         a_i = combined_input
         for layer in self.layers:
             a_i = layer(a_i)
