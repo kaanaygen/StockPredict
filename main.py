@@ -115,7 +115,7 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.cnn_model = CNN(max_ticker_index + 1, dataSet.shape[1]-1)
+        self.cnn_model = CNN(max_ticker_index + 1, dataSet.shape[1])
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
