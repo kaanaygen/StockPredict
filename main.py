@@ -115,7 +115,7 @@ class runCNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.cnn_model = CNN(max_ticker_index + 1, dataSet.columns.shape[0])
+        self.cnn_model = CNN(max_ticker_index + 1, dataSet.shape[1]-1)
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.SGD(self.cnn_model.parameters(), lr=self.learning_rate, momentum=0.9)
         self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.5, patience= 2)
@@ -173,7 +173,7 @@ class runDNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(max_ticker_index + 1, dataSet.columns.shape[0])
+        self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1] - 1)
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr = self.learning_rate)
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 2)
