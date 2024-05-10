@@ -59,7 +59,7 @@ def train(device: torch.device, model: nn.Module, dataloader: DataLoader,
     patience = 20
     trigger_times = 0
     epoch_average_losses = []
-    display_interval = 10000
+    display_interval = 5000
     
     for train_epoch in range(num_epochs):
         running_epoch_loss = 0.0
@@ -110,7 +110,7 @@ def train(device: torch.device, model: nn.Module, dataloader: DataLoader,
 def test_model(device: torch.device, model: nn.Module, dataloader: DataLoader, 
                 loss_func: nn.MSELoss) -> float:
     
-    model.eval()to(device)
+    model.eval().to(device)
     total_test_loss = 0.0
     total_samples_processed = 0
     with torch.no_grad():
