@@ -59,7 +59,9 @@ class Preprocess:
         print(ticker_counts.describe())
 
         # Check for tickers with significantly fewer entries
-        print(ticker_counts[ticker_counts > 1000])
+        sorted_tickers = ticker_day_counts.sort_values(ascending=False)
+        print(sorted_tickers.head(10))
+
         
         self.data.dropna(inplace=True)
         print("Data shape after dropping NAs:", self.data.shape)
