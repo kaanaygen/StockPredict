@@ -182,7 +182,7 @@ class runDNNModel:
         industries = data_preprocessor.get_encoded_industries()
         sectors = data_preprocessor.get_encoded_sectors()
         max_industry_index = torch.max(torch.tensor(industries)).item()
-        max_sector_index = torch.max(torch.tensor(sector)).item()
+        max_sector_index = torch.max(torch.tensor(sectors)).item()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
         data_preprocessor.print_all_columns(dataSet)
 
