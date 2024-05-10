@@ -76,7 +76,7 @@ class Preprocess:
         num_sectors = len(self.data['Sector_encoded'].unique())
         num_industries = len(self.data['Industry_encoded'].unique())
 
-        self.data.drop(columns=['Sector', 'Industry', 'Sector_encoded', 'Industry_encoded'], inplace=True)
+        self.data.drop(columns=['Sector', 'Industry'], inplace=True)
        
 
         ticker_to_int, unique_tickers = pd.factorize(self.data['Symbol'])
@@ -187,6 +187,7 @@ class runDNNModel:
         tickers = data_preprocessor.get_encoded_tickers()
         industries = data_preprocessor.get_encoded_industries()
         sectors = data_preprocessor.get_encoded_sectors()
+        dataSet.drop(columns = 'Sector_encoded', 'Industry_encoded', inplace=True)
         max_industry_index = torch.max(torch.tensor(industries)).item()
         max_sector_index = torch.max(torch.tensor(sectors)).item()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
