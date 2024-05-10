@@ -189,18 +189,17 @@ class runDNNModel:
 
 
         y = dataSet['Close'].values.reshape(-1, 1)  
-        X = dataSet.drop(columns=['Close'])
+        fetures = dataSet.drop(columns=['Close'])
         pd.set_option('display.max_columns', None)  # Ensures all columns are displayed
         pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
         pd.set_option('display.max_colwidth', None)  # Allows full width of column display
         pd.set_option('display.width', 1000)  # Sets the width of the display for wide DataFrames
 
-        X_train, X_test, y_train, y_test, X_train_tickers, X_test_tickers, 
-        X_train_sectors, X_test_sectors, X_train_industries, X_test_industries = train_test_split(
-        X, y, tickers, sectors, industries, 
-        train_size=0.9, 
-        test_size=0.1, 
-        random_state=8)
+        X_train, X_test, y_train, y_test, X_train_tickers, X_test_tickers, X_train_sectors, X_test_sectors, X_train_industries, X_test_industries = train_test_split(
+            features, y, tickers, sectors, industries, 
+            train_size=0.9, 
+            test_size=0.1, 
+            random_state=8)
 
 
         # Normalizing the features
