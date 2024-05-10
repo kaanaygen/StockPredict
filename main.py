@@ -66,7 +66,7 @@ class Preprocess:
 
 
 
-        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = np.int)
+        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = torch.int)
 
        
 
