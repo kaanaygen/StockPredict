@@ -26,7 +26,7 @@ class CNN(nn.Module):
         
         self.flatten = nn.Flatten().to(self.device)
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size, device=self.device))
 
         self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512).to(self.device)
         self.fully_cnnctd_2 = nn.Linear(512, 256).to(self.device)
