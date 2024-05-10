@@ -140,8 +140,8 @@ class runCNNModel:
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
         data_preprocessor.print_all_columns(dataSet)
 
-        y = dataSet['close'].values.reshape(-1, 1)  
-        dataSet.drop(columns=['close'], inplace=True)
+        y = dataSet['Close'].values.reshape(-1, 1)  
+        dataSet.drop(columns=['Close'], inplace=True)
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
             dataSet, tickers, y, 
