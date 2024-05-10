@@ -67,7 +67,7 @@ def train(model: nn.Module, dataloader: DataLoader,
             total_samples_processed += batch_samples
 
             if (i + 1) % display_interval == 0:
-                print(f"Epoch {train_epoch + 1}, Batch {i + 1}: Loss = {batch_loss_value:.4f}")
+                print(f"Epoch {train_epoch + 1}, Batch {i + 1}: Loss = {batch_loss_value:.2e}")
 
         
         epoch_loss = running_epoch_loss / total_samples_processed
@@ -77,7 +77,7 @@ def train(model: nn.Module, dataloader: DataLoader,
         if lr_scheduler is not None:
             lr_scheduler.step(epoch_loss)
         
-        print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.4f}")
+        print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.2e}")
 
     return epoch_average_losses
 
