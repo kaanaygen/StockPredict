@@ -47,7 +47,7 @@ class Preprocess:
 
 
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
-        self.data['date'] = pd.to_datetime(data['date'])
+        self.data['date'] = pd.to_datetime(self.data['date'])
 
         # Group by ticker and then count the unique dates for each ticker
         ticker_day_counts = self.data.groupby('ticker')['date'].nunique()
