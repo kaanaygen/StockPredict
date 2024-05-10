@@ -66,7 +66,7 @@ class Preprocess:
 
 
 
-        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = np.int32)
+        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = int)
 
        
 
@@ -80,7 +80,7 @@ class Preprocess:
         self.data['Year'] = self.data['Date'].dt.year
         self.data['Month'] = self.data['Date'].dt.month
         self.data['Day_of_Week'] = self.data['Date'].dt.dayofweek 
-        self.data = pd.get_dummies(self.data, columns=['Month', 'Day_of_Week'], dtype = np.int)
+        self.data = pd.get_dummies(self.data, columns=['Month', 'Day_of_Week'], dtype = int)
         self.data.drop(columns = ['Date'], inplace=True)
 
 
