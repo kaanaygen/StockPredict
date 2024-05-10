@@ -41,7 +41,7 @@ class DNN(nn.Module):
         return output
 
 
-def train(model: nn.Module, dataloader: DataLoader, 
+def train(device: torch.device, model: nn.Module, dataloader: DataLoader, 
           loss_func: nn.MSELoss, optimizer: torch.optim, 
           lr_scheduler: optim.lr_scheduler, num_epochs: int) -> list[float]:
     

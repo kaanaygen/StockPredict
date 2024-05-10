@@ -212,7 +212,7 @@ class runDNNModel:
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.9, patience= 2)
 
 
-        train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
+        train(device, self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
         test_model(self.dnn_model, dataloader_test_set, self.DNN_loss_func)
 
 
