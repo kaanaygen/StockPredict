@@ -73,11 +73,17 @@ class Preprocess:
 
         self.data['Sector_encoded'] = sector_to_int
         self.data['Industry_encoded'] = industry_to_int
+        num_sectors = len(self.data['Sector_encoded'].unique())
+        num_industries = len(self.data['Industry_encoded'].unique())
+
         self.data.drop(columns=['Sector', 'Industry'], inplace=True)
        
 
         ticker_to_int, unique_tickers = pd.factorize(self.data['Symbol'])
         self.data['Symbol_encoded'] = ticker_to_int
+        num_tickers = len(self.data['Symbol_encoded'].unique())
+        print(f"Unique Tickers: {num_tickers}, Unique Sectors: {num_sectors}, Unique Industries: {num_industries}")
+
         self.ticker_encoded = self.data['Symbol_encoded'].values
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
         self.data.drop(columns=['Symbol', 'Symbol_encoded'], inplace=True)

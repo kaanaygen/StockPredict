@@ -14,7 +14,7 @@ class DNN(nn.Module):
         sector_embedding_dim = 8
         industry_embedding_dim = 16  
 
-        self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16, 1]
+        self.hidden_layers_size = [512, 384, 288, 216, 162, 128, 64, 32, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
