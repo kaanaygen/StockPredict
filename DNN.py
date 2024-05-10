@@ -12,17 +12,17 @@ class DNN(nn.Module):
         ticker_embedding_dim = 32
         concat_input_size = ticker_embedding_dim + num_features
         self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16, 1]
-        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim)
+        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
         self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0]))
-        self.layers.append(nn.ReLU())
+        self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(device)
+        self.layers.append(nn.ReLU()).to(device)
 
         for layer in range(1, len(self.hidden_layers_size)):
-            self.layers.append(nn.Linear(self.hidden_layers_size[layer-1], self.hidden_layers_size[layer]))
-            self.layers.append(nn.ReLU())
-            self.layers.append(nn.Dropout(p=0.3))
+            self.layers.append(nn.Linear(self.hidden_layers_size[layer-1], self.hidden_layers_size[layer])).to(device)
+            self.layers.append(nn.ReLU()).to(device)
+            self.layers.append(nn.Dropout(p=0.3)).to(device)
         
-        self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1))
+        self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1)).to(device)
 
         for layer in self.layers:
             if isinstance(layer, nn.Linear):
@@ -44,7 +44,7 @@ def train(model: nn.Module, dataloader: DataLoader,
           loss_func: nn.MSELoss, optimizer: torch.optim, 
           lr_scheduler: optim.lr_scheduler, num_epochs: int) -> list[float]:
     
-    model.train()
+    model.train().to(device)
     epoch_average_losses = []
     display_interval = 250
     
@@ -53,6 +53,7 @@ def train(model: nn.Module, dataloader: DataLoader,
         total_samples_processed = 0
         
         for i, (X_numeric, X_ticker_indices, Y_b) in enumerate(dataloader):
+            X_numeric, X_ticker_indices, Y_b = X_numeric.to(device), X_ticker_indices.to(device), Y_b.to(device)
             optimizer.zero_grad()
             batch_prediction = model(X_numeric, X_ticker_indices)
             batch_loss = loss_func(batch_prediction, Y_b)

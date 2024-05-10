@@ -161,7 +161,8 @@ class runDNNModel:
     
    
     def run(self):           
-
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f'Using device: {device}')
         data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
@@ -186,16 +187,18 @@ class runDNNModel:
             test_size=0.1, 
             random_state=8)
 
+        X_train, X_test, Y_train, Y_test = map(lambda x: torch.tensor(x, device=device),(X_train, X_test, Y_train, Y_test))
+
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test) 
 
-        tensor_X_train = torch.tensor(X_train, dtype=torch.float32)
-        tensor_X_test = torch.tensor(X_test, dtype=torch.float32)
-        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.int)  
-        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.int)
-        tensor_y_train = torch.tensor(y_train, dtype=torch.float32)
-        tensor_y_test = torch.tensor(y_test, dtype=torch.float32)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32, device=device)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32, device=device)
+        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long, device=device)
+        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long, device=device)
+        tensor_y_train = torch.tensor(y_train, dtype=torch.float32, device=device)
+        tensor_y_test = torch.tensor(y_test, dtype=torch.float32, device=device)
 
         train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
