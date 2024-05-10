@@ -59,7 +59,7 @@ class Preprocess:
         top_n = 10  # Adjust this number based on how many top tickers you want to see
 
         # Print the top N tickers with their respective number of unique trading days
-        print(sorted_tickers.head(top_n))
+        print(sorted_tickers.head(100))
 
 
 
