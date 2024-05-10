@@ -189,38 +189,37 @@ class runDNNModel:
 
 
         y = dataSet['Close'].values.reshape(-1, 1)  
-        features = dataSet.drop(columns=['Close'])
+        X = dataSet.drop(columns=['Close'])
         pd.set_option('display.max_columns', None)  # Ensures all columns are displayed
         pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
         pd.set_option('display.max_colwidth', None)  # Allows full width of column display
         pd.set_option('display.width', 1000)  # Sets the width of the display for wide DataFrames
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            features, y, 
-            train_size=0.9, 
-            test_size=0.1, 
-            random_state=8)
+        X_train, X_test, y_train, y_test, X_train_tickers, X_test_tickers, 
+        X_train_sectors, X_test_sectors, X_train_industries, X_test_industries = train_test_split(
+        X, y, tickers, sectors, industries, 
+        train_size=0.9, 
+        test_size=0.1, 
+        random_state=8)
 
-        # Extracting indices to get tickers, sectors, industries
-        train_indices = X_train.index
-        test_indices = X_test.index
 
         # Normalizing the features
         scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
         # Converting all to tensors for PyTorch
-        tensor_X_train = torch.tensor(X_train_scaled, dtype=torch.float32, device=device)
-        tensor_X_test = torch.tensor(X_test_scaled, dtype=torch.float32, device=device)
+        tensor_X_train = torch.tensor(X_train, dtype=torch.float32, device=device)
+        tensor_X_test = torch.tensor(X_test, dtype=torch.float32, device=device)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32, device=device)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32, device=device)
-        tensor_X_train_tickers = torch.tensor(X_train['Symbol_encoded'].values, dtype=torch.long, device=device)
-        tensor_X_test_tickers = torch.tensor(X_test['Symbol_encoded'].values, dtype=torch.long, device=device)
-        tensor_X_sector_train = torch.tensor(X_train['Sector_encoded'].values, dtype=torch.long, device=device)
-        tensor_X_sector_test = torch.tensor(X_test['Sector_encoded'].values, dtype=torch.long, device=device)
-        tensor_X_industry_train = torch.tensor(X_train['Industry_encoded'].values, dtype=torch.long, device=device)
-        tensor_X_industry_test = torch.tensor(X_test['Industry_encoded'].values, dtype=torch.long, device=device)
+
+        tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long, device=device)
+        tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long, device=device)
+        tensor_X_sector_train = torch.tensor(X_train_sectors, dtype=torch.long, device=device)
+        tensor_X_sector_test = torch.tensor(X_test_sectors, dtype=torch.long, device=device)
+        tensor_X_industry_train = torch.tensor(X_train_industries, dtype=torch.long, device=device)
+        tensor_X_industry_test = torch.tensor(X_test_industries, dtype=torch.long, device=device)
 
         # Creating datasets
         train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_X_sector_train, tensor_X_industry_train, tensor_y_train)
