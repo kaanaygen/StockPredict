@@ -92,7 +92,7 @@ class Preprocess:
 
     def get_num_unique_tickers(self):
         return len(self.int_to_ticker_map)
-
+"""
 
 #class runCNNModel:
 
@@ -145,11 +145,12 @@ class Preprocess:
 
         train(self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.CNN_scheduler, self.epochs)
         test_model(self.cnn_model, dataloader_test_set, self.CNN_loss_func)
+"""
 
 class runDNNModel:
 
     def __init__(self):
-        self.batch_size = 8
+        self.batch_size = 256
         self.learning_rate = 0.001
         self.epochs = 250
     
