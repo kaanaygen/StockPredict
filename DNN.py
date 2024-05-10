@@ -7,22 +7,23 @@ from tqdm import tqdm
 import torch.optim.lr_scheduler
 
 class DNN(nn.Module):
-    def __init__(self, num_tickers, num_features):
+    def __init__(self, num_tickers, num_features, device):
         super().__init__()
+        self.device = device
         ticker_embedding_dim = 32
         concat_input_size = ticker_embedding_dim + num_features
         self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16, 1]
-        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
+        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
         self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(device)
-        self.layers.append(nn.ReLU()).to(device)
+        self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(self.device)
+        self.layers.append(nn.ReLU()).to(self.device)
 
         for layer in range(1, len(self.hidden_layers_size)):
-            self.layers.append(nn.Linear(self.hidden_layers_size[layer-1], self.hidden_layers_size[layer])).to(device)
-            self.layers.append(nn.ReLU()).to(device)
-            self.layers.append(nn.Dropout(p=0.3)).to(device)
+            self.layers.append(nn.Linear(self.hidden_layers_size[layer-1], self.hidden_layers_size[layer])).to(self.device)
+            self.layers.append(nn.ReLU()).to(self.device)
+            self.layers.append(nn.Dropout(p=0.3)).to(self.device)
         
-        self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1)).to(device)
+        self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1)).to(self.device)
 
         for layer in self.layers:
             if isinstance(layer, nn.Linear):
