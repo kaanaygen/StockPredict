@@ -18,7 +18,7 @@ class DNN(nn.Module):
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
-        concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim
+        concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim - 1
 
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(self.device)
