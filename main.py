@@ -141,19 +141,6 @@ class runCNNModel:
         data_preprocessor.print_all_columns(dataSet)
 
         y = dataSet['Close'].values.reshape(-1, 1)  
-        dataSet.drop(columns=['Close'], inplace=True)
-
-        X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
-            dataSet, tickers, y, 
-            train_size=0.8, 
-            test_size=0.2, 
-            random_state=8)
-
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)  # Only transform, do not fit!
-       
-        y = dataSet['Close'].values.reshape(-1, 1)  
         features = dataSet.drop(columns=['Close'])
         pd.set_option('display.max_columns', None)  # Ensures all columns are displayed
         pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
