@@ -85,6 +85,10 @@ class Preprocess:
         self.data.drop(columns = ['Date'], inplace=True)
         print("Data preprocessing completed.")
 
+    def print_all_columns(data):
+        # Convert column names to a single string with each name separated by a newline
+        columns_string = "\n".join(data.columns)
+        print(columns_string)
 
     def get_preprocessed_data(self):
         return self.data
@@ -166,6 +170,7 @@ class runDNNModel:
         tickers = data_preprocessor.get_encoded_tickers()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
         num_unique_tickers = data_preprocessor.get_num_unique_tickers()
+        data_preprocessor.print_all_columns(dataSet)
 
 
 
@@ -175,8 +180,6 @@ class runDNNModel:
         pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
         pd.set_option('display.max_colwidth', None)  # Allows full width of column display
         pd.set_option('display.width', 1000)  # Sets the width of the display for wide DataFrames
-        print(dataSet.columns)
-
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
             dataSet, tickers, y, 
