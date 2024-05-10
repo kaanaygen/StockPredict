@@ -189,7 +189,7 @@ class runDNNModel:
 
 
         y = dataSet['Close'].values.reshape(-1, 1)  
-        fetures = dataSet.drop(columns=['Close'])
+        features = dataSet.drop(columns=['Close'])
         pd.set_option('display.max_columns', None)  # Ensures all columns are displayed
         pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
         pd.set_option('display.max_colwidth', None)  # Allows full width of column display
