@@ -85,7 +85,7 @@ class Preprocess:
         self.data.drop(columns = ['Date'], inplace=True)
         print("Data preprocessing completed.")
 
-    def print_all_columns(data):
+    def print_all_columns(self, data):
         # Convert column names to a single string with each name separated by a newline
         columns_string = "\n".join(data.columns)
         print(columns_string)
