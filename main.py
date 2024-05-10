@@ -17,69 +17,72 @@ from DNN import train, test_model
 
 class Preprocess:
 
-    def __init__(self, api_key):
-        nasdaqdatalink.ApiConfig.api_key = api_key
-        self.EOD_tickers = None 
-        self.EOD_prices = None 
-       
-    def load_data(self, tickers_table, prices_table):
-        self.EOD_tickers = nasdaqdatalink.export_table(tickers_table, filename = '/content/drive/MyDrive/Dset1.zip')
-        self.EOD_prices = nasdaqdatalink.export_table(prices_table, filename = '/content/drive/MyDrive/Dset2.zip')
-        with zipfile.ZipFile('/content/drive/MyDrive/Dset1.zip', 'r') as zip_ref:
-            zip_ref.extractall('/content/drive/MyDrive/tickers_Data')
-        with zipfile.ZipFile('/content/drive/MyDrive/Dset2.zip', 'r') as zip_ref:
-            zip_ref.extractall('/content/drive/MyDrive/prices_Data')            
-    
+    def __init__(self, path_to_dataset):
+        
+        self.sp500_index_price_data = None 
+        self.sp500_companies_data = None 
+        self.sp500_companies_stock_price_data = None
+        self.path_to_dataset = path_to_dataset
+
+    def load_data(self):
+                
+        for dirname, _, filenames in os.walk(self.path_to_dataset):
+            for filename in filenames:
+                data_path = os.path.join(dirname, filename)
+                if filename == 'sp500_stocks.csv':
+                    self.sp500_companies_stock_price_data = data_path
+                if filename == 'sp500_companies.csv':
+                    self.sp500_companies_data = data_path
+                if filename == 'sp500_index.csv':
+                    self.sp500_index_price_data = data_path
+
     def data_preprocess(self):
-        """
+        
+        stocks = pd.read_csv(self.sp500_companies_stock_price_data, parse_dates= ['Date'])
+        index = pd.read_csv(self.sp500_index_price_data, parse_dates= ['Date'])
+        companies = pd.read_csv(self.sp500_companies_data)
+        stocks['Date'] = pd.to_datetime(stocks['Date']).dt.date
+        index['Date'] = pd.to_datetime(index['Date']).dt.date
+
+        start_date = max(stocks['Date'].min(), index['Date'].min())
+        end_date = min(stocks['Date'].max(), index['Date'].max())
+
         nyse_calendar = pmc.get_calendar('NYSE')
         nyse_schedule = nyse_calendar.schedule(start_date=start_date, end_date=end_date)
         days_nyse_open = pmc.date_range(nyse_schedule, frequency = '1D')
         days_nyse_open = days_nyse_open.tz_localize(None).normalize().date
         days_nyse_open_timeSeries = pd.Series(days_nyse_open)
-        """
-        ticker_file = [f for f in os.listdir('/content/drive/MyDrive/tickers_Data') if f.endswith('.csv')][0]
-        price_file = [f for f in os.listdir('/content/drive/MyDrive/prices_Data') if f.endswith('.csv')][0]
-        self.tickerData = pd.read_csv(f'/content/drive/MyDrive/tickers_Data/{ticker_file}')
-        self.priceData = pd.read_csv(f'/content/drive/MyDrive/prices_Data/{price_file}')
-        print("Ticker data shape before merge:", self.tickerData.shape)
-        print("Price data shape before merge:", self.priceData.shape)
 
+        filtered_stocks = stocks[stocks['Date'].isin(days_nyse_open_timeSeries)]
+        filtered_index = index[index['Date'].isin(days_nyse_open_timeSeries)]
 
-        self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
-        self.data['date'] = pd.to_datetime(self.data['date'])
+        self.data = filtered_stocks.merge(filtered_index, on='Date', how='inner')
 
-        # Group by ticker and then count the unique dates for each ticker
-        ticker_day_counts = self.data.groupby('ticker')['date'].nunique()
+        companies_info_req = ['Symbol', 'Exchange', 'Sector', 'Industry']
+        filtered_companies = companies[companies_info_req]
 
-        # Sort the tickers by the count of unique dates in descending order
-        sorted_tickers = ticker_day_counts.sort_values(ascending=False)
-
-        # Define the number of top tickers you want to display
-        top_n = 10  # Adjust this number based on how many top tickers you want to see
-
-        # Print the top N tickers with their respective number of unique trading days
-        print(sorted_tickers.head(100))
+        self.data = self.data.merge(filtered_companies, on='Symbol', how='left')
+        self.data.dropna(inplace=True)
 
 
 
-        ticker_to_int, unique_tickers = pd.factorize(self.data['ticker'])
-        self.data['ticker_encoded'] = ticker_to_int
-        self.ticker_encoded = self.data['ticker_encoded'].values
+        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = np.int)
+
+       
+
+        ticker_to_int, unique_tickers = pd.factorize(self.data['Symbol'])
+        self.data['Symbol_encoded'] = ticker_to_int
+        self.ticker_encoded = self.data['Symbol_encoded'].values
         self.int_to_ticker_map = {i: ticker for i, ticker in enumerate(unique_tickers)}
-        self.data.drop(columns=['ticker', 'ticker_encoded'], inplace=True)
+        self.data.drop(columns=['Symbol', 'Symbol_encoded'], inplace=True)
         
-        self.data['date'] = pd.to_datetime(self.data['date'], format='%Y-%m-%d')
-        self.data['year'] = self.data['date'].dt.year
-        self.data['month'] = self.data['date'].dt.month
-        self.data['day_of_week'] = self.data['date'].dt.dayofweek 
-        self.data = pd.get_dummies(self.data, columns=['month', 'day_of_week'], dtype = np.float16)
-        self.data.drop(columns = ['date'], inplace=True)
+        self.data['Date'] = pd.to_datetime(self.data['Date'], format='%Y-%m-%d')
+        self.data['Year'] = self.data['Date'].dt.year
+        self.data['Month'] = self.data['Date'].dt.month
+        self.data['Day_of_Week'] = self.data['Date'].dt.dayofweek 
+        self.data = pd.get_dummies(self.data, columns=['Month', 'Day_of_Week'], dtype = np.int)
+        self.data.drop(columns = ['Date'], inplace=True)
 
-
-        self.data = pd.get_dummies(self.data, columns=['exchange'], dtype = np.float16)
-        self.data.drop(columns=['company_name'], inplace=True)
-        self.data.columns = [col.replace(' ', '_') for col in self.data.columns]
 
     def get_preprocessed_data(self):
         return self.data
@@ -91,7 +94,7 @@ class Preprocess:
         return len(self.int_to_ticker_map)
 
 
-class runCNNModel:
+#class runCNNModel:
 
     def __init__(self):
         self.batch_size = 1024
@@ -153,8 +156,8 @@ class runDNNModel:
    
     def run(self):           
 
-        data_preprocessor = Preprocess(api_key='hwPz-N4Amv1UHR8j5z3C')
-        data_preprocessor.load_data('QUOTEMEDIA/TICKERS', 'QUOTEMEDIA/DAILYPRICES')
+        data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
+        data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
@@ -163,8 +166,8 @@ class runDNNModel:
 
 
 
-        y = dataSet['close'].values.reshape(-1, 1)  
-        dataSet.drop(columns=['close'], inplace=True)
+        y = dataSet['Close'].values.reshape(-1, 1)  
+        dataSet.drop(columns=['Close'], inplace=True)
 
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
