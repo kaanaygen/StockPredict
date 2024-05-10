@@ -187,7 +187,6 @@ class runDNNModel:
             test_size=0.1, 
             random_state=8)
 
-        X_train, X_test, Y_train, Y_test = map(lambda x: torch.tensor(x, device=device),(X_train, X_test, Y_train, Y_test))
 
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
@@ -207,10 +206,10 @@ class runDNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])
+        self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1]).to(device)
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate)
-        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 2)
+        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.9, patience= 2)
 
 
         train(self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
