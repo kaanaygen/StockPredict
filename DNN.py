@@ -46,7 +46,7 @@ def train(model: nn.Module, dataloader: DataLoader,
     
     model.train()
     epoch_average_losses = []
-    display_interval = 10000
+    display_interval = 10
     
     for train_epoch in range(num_epochs):
         running_epoch_loss = 0.0
