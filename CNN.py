@@ -50,9 +50,15 @@ class CNN(nn.Module):
         embedded_sectors = self.sector_embedding(X_sectors)
         embedded_industries = self.industry_embedding(X_industries)
         embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
-        # No need to unsqueeze X here since it's already unsqueezed in the main script
-        # Concatenate along the batch dimension (dimension 1)
+        print("X shape:", X.shape)
+        print("embedded shape:", embedded.shape)
+        
+        # Ensure X is also unsqueezed if it is not already (assuming it might be missing)
+        if X.dim() == 2:
+            X = X.unsqueeze(1)  # Adding channel dimension
+
         X = torch.cat((X, embedded), dim=2).to(self.device)
+        print("Concatenated X shape:", X.shape)
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
