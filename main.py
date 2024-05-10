@@ -81,7 +81,6 @@ class Preprocess:
         self.data['Year'] = self.data['Date'].dt.year
         self.data['Month'] = self.data['Date'].dt.month
         self.data['Day_of_Week'] = self.data['Date'].dt.dayofweek 
-        self.data = pd.get_dummies(self.data, columns=['Month', 'Day_of_Week'], dtype = int)
         self.data.drop(columns = ['Date'], inplace=True)
         print("Data preprocessing completed.")
 
@@ -205,7 +204,7 @@ class runDNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1])
+        self.dnn_model = DNN(max_ticker_index, dataSet.shape[1])
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate)
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.5, patience= 5)
