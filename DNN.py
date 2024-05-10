@@ -122,7 +122,7 @@ def test_model(device: torch.device, model: nn.Module, dataloader: DataLoader,
             batch_size = X_numeric.size(0)
             total_samples_processed += batch_size
             total_test_loss += batch_loss.item() * batch_size
-    avg_test_loss = total_test_loss total_samples_processed
+    avg_test_loss = total_test_loss / total_samples_processed
     print("Test Loss:", avg_test_loss)
     return avg_test_loss  
 
