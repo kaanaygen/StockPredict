@@ -196,7 +196,7 @@ class runDNNModel:
         pd.set_option('display.width', 1000)  # Sets the width of the display for wide DataFrames
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, 
+            dataSet, y, 
             train_size=0.9, 
             test_size=0.1, 
             random_state=8)
