@@ -171,6 +171,11 @@ class runDNNModel:
 
         y = dataSet['Close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['Close'], inplace=True)
+        pd.set_option('display.max_columns', None)
+        # Optional: set to display all rows as well
+        pd.set_option('display.max_rows', None)
+        # Set to display wide columns as well
+        pd.set_option('display.width', 1000)    
         print(dataSet.columns)
 
 
