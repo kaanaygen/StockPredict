@@ -171,7 +171,7 @@ class runDNNModel:
 
         y = dataSet['Close'].values.reshape(-1, 1)  
         dataSet.drop(columns=['Close'], inplace=True)
-        print(dataSet.head(2))
+        print(dataSet.columns)
 
 
         X_train, X_test, X_train_tickers, X_test_tickers, y_train, y_test = train_test_split(
