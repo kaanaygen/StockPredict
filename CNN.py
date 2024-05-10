@@ -45,7 +45,7 @@ class CNN(nn.Module):
             shape = x.shape[1]
         return shape
 
-    def forward(self, X: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
+    def forward(self, X: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
         embedded_sectors = self.sector_embedding(X_sectors)
         embedded_industries = self.industry_embedding(X_industries)
