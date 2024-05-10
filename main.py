@@ -25,7 +25,7 @@ class Preprocess:
         self.path_to_dataset = path_to_dataset
 
     def load_data(self):
-                
+        print("Loading data...")        
         for dirname, _, filenames in os.walk(self.path_to_dataset):
             for filename in filenames:
                 data_path = os.path.join(dirname, filename)
@@ -37,7 +37,8 @@ class Preprocess:
                     self.sp500_index_price_data = data_path
 
     def data_preprocess(self):
-        
+        print("Preprocessing data...")
+
         stocks = pd.read_csv(self.sp500_companies_stock_price_data, parse_dates= ['Date'])
         index = pd.read_csv(self.sp500_index_price_data, parse_dates= ['Date'])
         companies = pd.read_csv(self.sp500_companies_data)
@@ -82,6 +83,7 @@ class Preprocess:
         self.data['Day_of_Week'] = self.data['Date'].dt.dayofweek 
         self.data = pd.get_dummies(self.data, columns=['Month', 'Day_of_Week'], dtype = int)
         self.data.drop(columns = ['Date'], inplace=True)
+        print("Data preprocessing completed.")
 
 
     def get_preprocessed_data(self):
