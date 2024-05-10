@@ -7,13 +7,19 @@ from tqdm import tqdm
 import torch.optim.lr_scheduler
 
 class DNN(nn.Module):
-    def __init__(self, num_tickers, num_features, device):
+    def __init__(self, device, num_tickers, num_sectors, num_industries, num_features):
         super().__init__()
         self.device = device
         ticker_embedding_dim = 32
-        concat_input_size = ticker_embedding_dim + num_features
+        sector_embedding_dim = 8
+        industry_embedding_dim = 16  
+
         self.hidden_layers_size = [1024, 512, 256, 128, 64, 32, 16, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
+        self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
+        self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
+        concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim
+
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(self.device)
         self.layers.append(nn.ReLU()).to(self.device)
@@ -33,7 +39,10 @@ class DNN(nn.Module):
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
-        combined_input = torch.cat((X_features, embedded_tickers), dim=1)
+        embedded_sectors = self.sector_embedding(X_sectors)
+        embedded_industries = self.industry_embedding(X_industries)
+
+        combined_input = torch.cat((X_features, embedded_tickers, embedded_sectors, embedded_industries), dim=1)
         a_i = combined_input
         for layer in self.layers:
             a_i = layer(a_i)
@@ -53,10 +62,11 @@ def train(device: torch.device, model: nn.Module, dataloader: DataLoader,
         running_epoch_loss = 0.0
         total_samples_processed = 0
         
-        for i, (X_numeric, X_ticker_indices, Y_b) in enumerate(dataloader):
+        for i, (X_numeric, X_ticker_indices, X_sector_indices, X_industry_indices, Y_b) in enumerate(dataloader):
             X_numeric, X_ticker_indices, Y_b = X_numeric.to(device), X_ticker_indices.to(device), Y_b.to(device)
+            X_sector_indices, X_industry_indices = X_sector_indices.to(device), X_industry_indices.to(device)
             optimizer.zero_grad()
-            batch_prediction = model(X_numeric, X_ticker_indices)
+            batch_prediction = model(X_numeric, X_ticker_indices, X_sector_indices, X_industry_indices)
             batch_loss = loss_func(batch_prediction, Y_b)
             batch_loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)

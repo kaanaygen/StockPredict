@@ -67,8 +67,13 @@ class Preprocess:
 
 
 
-        self.data = pd.get_dummies(self.data, columns=['Exchange', 'Sector', 'Industry'], dtype = int)
+        self.data = pd.get_dummies(self.data, columns=['Exchange'], dtype = int)
+        sector_to_int, _ = pd.factorize(self.data['Sector'])
+        industry_to_int, _ = pd.factorize(self.data['Industry'])
 
+        self.data['Sector_encoded'] = sector_to_int
+        self.data['Industry_encoded'] = industry_to_int
+        self.data.drop(columns=['Sector', 'Industry'], inplace=True)
        
 
         ticker_to_int, unique_tickers = pd.factorize(self.data['Symbol'])
@@ -97,6 +102,12 @@ class Preprocess:
 
     def get_num_unique_tickers(self):
         return len(self.int_to_ticker_map)
+
+    def get_encoded_industries(self):
+        return self.data['Industry_encoded'].values
+
+    def get_encoded_sectors(self):
+        return self.data['Sector_encoded'].values
 """
 
 #class runCNNModel:
@@ -168,8 +179,11 @@ class runDNNModel:
         data_preprocessor.data_preprocess()
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
+        industries = data_preprocessor.get_encoded_industries()
+        sectors = data_preprocessor.get_encoded_sectors()
+        max_industry_index = torch.max(torch.tensor(industries)).item()
+        max_sector_index = torch.max(torch.tensor(sector)).item()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
-        num_unique_tickers = data_preprocessor.get_num_unique_tickers()
         data_preprocessor.print_all_columns(dataSet)
 
 
@@ -196,17 +210,19 @@ class runDNNModel:
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32, device=device)
         tensor_X_train_tickers = torch.tensor(X_train_tickers, dtype=torch.long, device=device)
         tensor_X_test_tickers = torch.tensor(X_test_tickers, dtype=torch.long, device=device)
+        tensor_X_sector = torch.tensor(data['Sector_encoded'].values, dtype=torch.long, device=device)
+        tensor_X_industry = torch.tensor(data['Industry_encoded'].values, dtype=torch.long, device=device)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32, device=device)
         tensor_y_test = torch.tensor(y_test, dtype=torch.float32, device=device)
 
-        train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_y_train)
-        test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_y_test)
+        train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_X_sector, tensor_X_industry, tensor_y_train)
+        test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_X_sector, tensor_X_industry, tensor_y_test)
 
 
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(max_ticker_index + 1, dataSet.shape[1], device).to(device)
+        self.dnn_model = DNN(device, max_ticker_index + 1, max_sector_index + 1, max_industry_index + 1, dataSet.shape[1]).to(device)
         self.DNN_loss_func = nn.MSELoss()
         self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate)
         self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.9, patience= 2)
