@@ -47,24 +47,19 @@ class Preprocess:
 
 
         self.data = pd.merge(self.tickerData, self.priceData, on='ticker', how='inner')
-        print("Data shape after merge:", self.data.shape)
-        print("Number of missing values:", self.data.isnull().sum().sum())
+        self.data['date'] = pd.to_datetime(data['date'])
 
-        ticker_counts = self.data.groupby('ticker').size()
+        # Group by ticker and then count the unique dates for each ticker
+        ticker_day_counts = self.data.groupby('ticker')['date'].nunique()
 
-        # You can also check how many dates each ticker has
-        date_counts = self.data.groupby(['ticker', 'date']).size()
-
-        # Display the distribution of count of appearances for each ticker
-        print(ticker_counts.describe())
-
-        # Check for tickers with significantly fewer entries
+        # Sort the tickers by the count of unique dates in descending order
         sorted_tickers = ticker_day_counts.sort_values(ascending=False)
-        print(sorted_tickers.head(10))
 
-        
-        self.data.dropna(inplace=True)
-        print("Data shape after dropping NAs:", self.data.shape)
+        # Define the number of top tickers you want to display
+        top_n = 10  # Adjust this number based on how many top tickers you want to see
+
+        # Print the top N tickers with their respective number of unique trading days
+        print(sorted_tickers.head(top_n))
 
 
 
