@@ -10,15 +10,15 @@ class DNN(nn.Module):
     def __init__(self, device, num_tickers, num_sectors, num_industries, num_features):
         super().__init__()
         self.device = device
-        ticker_embedding_dim = 32
-        sector_embedding_dim = 8
-        industry_embedding_dim = 16  
+        ticker_embedding_dim = 30
+        sector_embedding_dim = 10
+        industry_embedding_dim = 15  
 
         self.hidden_layers_size = [512, 384, 288, 216, 162, 128, 64, 32, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
-        concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim - 1
+        concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim 
 
         self.layers = nn.ModuleList()
         self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(self.device)
@@ -55,8 +55,11 @@ def train(device: torch.device, model: nn.Module, dataloader: DataLoader,
           lr_scheduler: optim.lr_scheduler, num_epochs: int) -> list[float]:
     
     model.train().to(device)
+    best_loss = float('inf')
+    patience = 20
+    trigger_times = 0
     epoch_average_losses = []
-    display_interval = 250
+    display_interval = 10000
     
     for train_epoch in range(num_epochs):
         running_epoch_loss = 0.0
@@ -91,21 +94,35 @@ def train(device: torch.device, model: nn.Module, dataloader: DataLoader,
         
         print(f"Epoch: {train_epoch + 1} | Loss: {epoch_loss:.2e}")
 
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            trigger_times = 0
+        else:
+            trigger_times += 1
+            if trigger_times >= patience:
+                print("Early stopping!")
+                break
+
     return epoch_average_losses
 
 
 
-def test_model(model: nn.Module, dataloader: DataLoader, 
+def test_model(device: torch.device, model: nn.Module, dataloader: DataLoader, 
                 loss_func: nn.MSELoss) -> float:
     
-    model.eval()
+    model.eval()to(device)
     total_test_loss = 0.0
+    total_samples_processed = 0
     with torch.no_grad():
-        for (X_numeric, X_ticker_indices, Y_b) in dataloader:
-            batch_prediction = model.forward(X_numeric, X_ticker_indices)
+        for i, (X_numeric, X_ticker_indices, X_sector_indices, X_industry_indices, Y_b) in enumerate(dataloader):
+            X_numeric, X_ticker_indices, Y_b = X_numeric.to(device), X_ticker_indices.to(device), Y_b.to(device)
+            X_sector_indices, X_industry_indices = X_sector_indices.to(device), X_industry_indices.to(device)
+            batch_prediction = model(X_numeric, X_ticker_indices, X_sector_indices, X_industry_indices)
             batch_loss = loss_func(batch_prediction, Y_b)
-            total_test_loss += batch_loss.item() * X_numeric.size(0)
-    avg_test_loss = total_test_loss / len(dataloader.dataset)
+            batch_size = X_numeric.size(0)
+            total_samples_processed += batch_size
+            total_test_loss += batch_loss.item() * batch_size
+    avg_test_loss = total_test_loss total_samples_processed
     print("Test Loss:", avg_test_loss)
     return avg_test_loss  
 

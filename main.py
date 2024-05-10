@@ -172,8 +172,8 @@ class Preprocess:
 class runDNNModel:
 
     def __init__(self):
-        self.batch_size = 256
-        self.learning_rate = 0.01
+        self.batch_size = 1024
+        self.learning_rate = 0.001
         self.epochs = 500
     
    
@@ -235,10 +235,10 @@ class runDNNModel:
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        self.dnn_model = DNN(device, max_ticker_index + 1, max_sector_index + 1, max_industry_index + 1, dataSet.shape[1]).to(device)
+        self.dnn_model = DNN(device, max_ticker_index + 1, max_sector_index + 1, max_industry_index + 1, dataSet.shape[1] + 1).to(device)
         self.DNN_loss_func = nn.MSELoss()
-        self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate)
-        self.DNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.DNN_optimizer, mode='min', factor=0.9, patience= 2)
+        self.DNN_optimizer = optim.Adam(self.dnn_model.parameters(), lr=self.learning_rate,  weight_decay=1e-5)
+        self.DNN_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
 
 
         train(device, self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
