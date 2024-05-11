@@ -185,7 +185,7 @@ class runCNNModel:
         self.cnn_model = CNN(device, max_ticker_index + 1, max_sector_index + 1, max_industry_index + 1, dataSet.shape[1] - 1).to(device)
         self.CNN_loss_func = nn.MSELoss()
         self.CNN_optimizer = optim.Adam(self.cnn_model.parameters(), lr=self.learning_rate,  weight_decay=1e-5)
-        self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.9, patience = 5)
+        self.CNN_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_optimizer, mode='min', factor=0.9, patience = 2)
 
 
         train(device, self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.CNN_scheduler, self.epochs)
