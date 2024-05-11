@@ -23,7 +23,7 @@ class CNN(nn.Module):
         self.conv1 = nn.Conv1d(in_channels= 1, out_channels=16, kernel_size=3, stride = 1).to(device)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1).to(device)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1).to(device)
-        
+        self.conv4 = nn.Conv1D(in_channels=64, out_channels=128, kernel_size= 3, stride=1).to(device)
         self.flatten = nn.Flatten().to(self.device)
 
         self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size, device=device))
@@ -41,6 +41,7 @@ class CNN(nn.Module):
             x = self.conv1(x)
             x = self.conv2(x)
             x = self.conv3(x)
+            s = self.conv4(x)
             x = self.flatten(x)
             shape = x.shape[1]
         return shape
@@ -58,7 +59,8 @@ class CNN(nn.Module):
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
-        o4 = self.flatten(o3)
+        o4 = torch.relu(self.conv3(o3))
+        o4 = self.flatten(o4)
         o5 = torch.relu(self.fully_cnnctd_1(o4))
         o6 = torch.relu(self.fully_cnnctd_2(o5))
         o7 = torch.relu(self.fully_cnnctd_3(o6))
