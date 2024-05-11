@@ -41,7 +41,7 @@ class CNN(nn.Module):
             x = self.conv1(x)
             x = self.conv2(x)
             x = self.conv3(x)
-            s = self.conv4(x)
+            x = self.conv4(x)
             x = self.flatten(x)
             shape = x.shape[1]
         return shape
