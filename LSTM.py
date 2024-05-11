@@ -28,15 +28,15 @@ class LSTM(nn.Module):
         self.batch_norm2 = nn.BatchNorm1d(64).to(device)
 
     def forward(self, X_features, X_tickers, X_sectors, X_industries):
-        X_tickers = self.ticker_embedding(X_tickers)
-        X_sectors = self.sector_embedding(X_sectors)
-        X_industries = self.industry_embedding(X_industries)
+        embedded_tickers = self.ticker_embedding(X_tickers)
+        embedded_sectors = self.sector_embedding(X_sectors)
+        embedded_industries = self.industry_embedding(X_industries)
+        embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
 
-        # Ensure the features tensor is the same dimension as the embeddings
-        X_features = X_features.unsqueeze(1)
+        if X.dim() == 2:
+            X = X.unsqueeze(1)  # Adding channel dimension
 
-        # Concatenate all inputs along the feature dimension (dimension=2)
-        X = torch.cat([X_features, X_tickers.unsqueeze(1), X_sectors.unsqueeze(1), X_industries.unsqueeze(1)], dim=2)
+        X = torch.cat((X, embedded), dim=2).to(self.device)
         
         # Process through LSTM
         lstm_out, _ = self.lstm(X)
