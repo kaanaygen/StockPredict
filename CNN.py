@@ -23,7 +23,7 @@ class CNN(nn.Module):
         self.conv1 = nn.Conv1d(in_channels= 1, out_channels=16, kernel_size=3, stride = 1).to(device)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1).to(device)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1).to(device)
-        self.conv4 = nn.Conv1D(in_channels=64, out_channels=128, kernel_size= 3, stride=1).to(device)
+        self.conv4 = nn.Conv1d(in_channels=64, out_channels=128, kernel_size= 3, stride=1).to(device)
         self.flatten = nn.Flatten().to(self.device)
 
         self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size, device=device))
