@@ -272,43 +272,42 @@ class runLSTMModel:
         self.epochs = 500
 
     def run(self):
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f'Using device: {device}')
-
         data_preprocessor = Preprocess('/content/drive/MyDrive/stock_predict_data')
         data_preprocessor.load_data()
         data_preprocessor.data_preprocess()
-
         dataSet = data_preprocessor.get_preprocessed_data()
         tickers = data_preprocessor.get_encoded_tickers()
         industries = data_preprocessor.get_encoded_industries()
         sectors = data_preprocessor.get_encoded_sectors()
-        dataSet.drop(columns=['Sector_encoded', 'Industry_encoded'], inplace=True)
-        
+        dataSet.drop(columns = ['Sector_encoded', 'Industry_encoded'], inplace=True)
         max_industry_index = torch.max(torch.tensor(industries)).item()
         max_sector_index = torch.max(torch.tensor(sectors)).item()
         max_ticker_index = torch.max(torch.tensor(tickers)).item()
         data_preprocessor.print_all_columns(dataSet)
 
-        y = dataSet['Close'].values.reshape(-1, 1)
+        y = dataSet['Close'].values.reshape(-1, 1)  
         features = dataSet.drop(columns=['Close'])
-        
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.expand_frame_repr', False)
-        pd.set_option('display.max_colwidth', None)
-        pd.set_option('display.width', 1000)
+        pd.set_option('display.max_columns', None)  # Ensures all columns are displayed
+        pd.set_option('display.expand_frame_repr', False)  # Prevents wrapping of columns
+        pd.set_option('display.max_colwidth', None)  # Allows full width of column display
+        pd.set_option('display.width', 1000)  # Sets the width of the display for wide DataFrames
 
         X_train, X_test, y_train, y_test, X_train_tickers, X_test_tickers, X_train_sectors, X_test_sectors, X_train_industries, X_test_industries = train_test_split(
-            features, y, tickers, sectors, industries,
-            train_size=0.9,
-            test_size=0.1,
-            random_state=8
-        )
+            features, y, tickers, sectors, industries, 
+            train_size=0.9, 
+            test_size=0.1, 
+            random_state=8)
 
+
+        # Normalizing the features
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
 
+        # Converting all to tensors for PyTorch
         tensor_X_train = torch.tensor(X_train, dtype=torch.float32, device=device)
         tensor_X_test = torch.tensor(X_test, dtype=torch.float32, device=device)
         tensor_y_train = torch.tensor(y_train, dtype=torch.float32, device=device)
@@ -321,8 +320,10 @@ class runLSTMModel:
         tensor_X_industry_train = torch.tensor(X_train_industries, dtype=torch.long, device=device)
         tensor_X_industry_test = torch.tensor(X_test_industries, dtype=torch.long, device=device)
 
+        # Creating datasets
         train_dataset = TensorDataset(tensor_X_train, tensor_X_train_tickers, tensor_X_sector_train, tensor_X_industry_train, tensor_y_train)
         test_dataset = TensorDataset(tensor_X_test, tensor_X_test_tickers, tensor_X_sector_test, tensor_X_industry_test, tensor_y_test)
+
 
         dataloader_train_set = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         dataloader_test_set = DataLoader(test_dataset, batch_size=self.batch_size)
