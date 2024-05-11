@@ -19,13 +19,16 @@ class LSTM(nn.Module):
 
         concat_input_size = ticker_embedding_dim + sector_embedding_dim + industry_embedding_dim + num_features
 
-        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=256, num_layers=2, batch_first=True).to(device)
-        self.fc1 = nn.Linear(256, 128).to(device)
-        self.fc2 = nn.Linear(128, 64).to(device)
-        self.fc3 = nn.Linear(64, 1).to(device)
+        # Increased complexity with more layers and units
+        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=512, num_layers=3, batch_first=True, dropout=0.1).to(device)
+        self.fc1 = nn.Linear(512, 256).to(device)
+        self.fc2 = nn.Linear(256, 128).to(device)
+        self.fc3 = nn.Linear(128, 64).to(device)
+        self.fc4 = nn.Linear(64, 1).to(device)  # Adding an extra linear layer
         self.relu = nn.ReLU().to(device)
-        self.batch_norm1 = nn.BatchNorm1d(128).to(device)
-        self.batch_norm2 = nn.BatchNorm1d(64).to(device)
+        self.batch_norm1 = nn.BatchNorm1d(256).to(device)
+        self.batch_norm2 = nn.BatchNorm1d(128).to(device)
+        self.batch_norm3 = nn.BatchNorm1d(64).to(device)
 
     def forward(self, X: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
@@ -34,18 +37,19 @@ class LSTM(nn.Module):
         embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
 
         if X.dim() == 2:
-            X = X.unsqueeze(1)  # Adding channel dimension
+            X = X.unsqueeze(1)  # Ensuring it has a channel dimension
 
         X = torch.cat((X, embedded), dim=2).to(self.device)
         
-        # Process through LSTM
         lstm_out, _ = self.lstm(X)
-        lstm_out = lstm_out[:, -1, :]  # Take the output from the last LSTM cell
+        lstm_out = lstm_out[:, -1, :]  # Taking the output from the last LSTM cell
 
         X = self.fc1(lstm_out)
         X = self.relu(self.batch_norm1(X))
         X = self.fc2(X)
         X = self.relu(self.batch_norm2(X))
         X = self.fc3(X)
+        X = self.relu(self.batch_norm3(X))
+        X = self.fc4(X)
 
         return X
