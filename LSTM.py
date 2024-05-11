@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 import torch.optim.lr_scheduler
 
-class LSTM(nn.Module):
+class EnhancedLSTM(nn.Module):
     def __init__(self, device, num_tickers, num_sectors, num_industries, num_features):
         super().__init__()
         self.device = device
@@ -19,16 +19,16 @@ class LSTM(nn.Module):
 
         concat_input_size = ticker_embedding_dim + sector_embedding_dim + industry_embedding_dim + num_features
 
-        # Using bidirectional LSTM and more hidden units
-        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=512, num_layers=4, batch_first=True, dropout=0.5, bidirectional=True).to(device)
-        self.fc1 = nn.Linear(1024, 512).to(device)  # Adjust for bidirectional output
+        # Configuring the LSTM with multiple layers and bi-directionality
+        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=256, num_layers=3, batch_first=True, dropout=0.1, bidirectional=True).to(device)
+        
+        # Fully connected layers, with the first layer taking the doubled output size from the bidirectional LSTM
+        self.fc1 = nn.Linear(512, 512).to(device)  # Adjusted for bidirectional output
         self.fc2 = nn.Linear(512, 256).to(device)
-        self.fc3 = nn.Linear(256, 128).to(device)
-        self.fc4 = nn.Linear(128, 1).to(device)
+        self.fc3 = nn.Linear(256, 1).to(device)
         self.relu = nn.ReLU().to(device)
         self.batch_norm1 = nn.BatchNorm1d(512).to(device)
         self.batch_norm2 = nn.BatchNorm1d(256).to(device)
-        self.batch_norm3 = nn.BatchNorm1d(128).to(device)
 
     def forward(self, X: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
@@ -49,7 +49,5 @@ class LSTM(nn.Module):
         X = self.fc2(X)
         X = self.relu(self.batch_norm2(X))
         X = self.fc3(X)
-        X = self.relu(self.batch_norm3(X))
-        X = self.fc4(X)
 
         return X
