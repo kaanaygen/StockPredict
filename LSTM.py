@@ -19,13 +19,16 @@ class LSTM(nn.Module):
 
         concat_input_size = ticker_embedding_dim + sector_embedding_dim + industry_embedding_dim + num_features
 
-        # Configuring the LSTM with multiple layers and bi-directionality
-        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=256, num_layers=3, batch_first=True, dropout=0.1, bidirectional=True).to(device)
-        
-        # Fully connected layers, with the first layer taking the doubled output size from the bidirectional LSTM
-        self.fc1 = nn.Linear(512, 512).to(device)  # Adjusted for bidirectional output
+        # Configuring the LSTM with more layers and increasing complexity
+        self.lstm1 = nn.LSTM(input_size=concat_input_size, hidden_size=512, num_layers=3, batch_first=True, dropout=0.2, bidirectional=True).to(device)
+        self.lstm2 = nn.LSTM(input_size=512*2, hidden_size=512, num_layers=3, batch_first=True, dropout=0.2, bidirectional=True).to(device)  # Keeping hidden size large for depth
+        self.lstm3 = nn.LSTM(input_size=512*2, hidden_size=256, num_layers=2, batch_first=True, dropout=0.2, bidirectional=True).to(device)  # Tapering down
+
+        # Fully connected layers after LSTM processing
+        self.fc1 = nn.Linear(256*2, 512).to(device)  # Adjusted for bidirectional output
         self.fc2 = nn.Linear(512, 256).to(device)
         self.fc3 = nn.Linear(256, 1).to(device)
+        
         self.relu = nn.ReLU().to(device)
         self.batch_norm1 = nn.BatchNorm1d(512).to(device)
         self.batch_norm2 = nn.BatchNorm1d(256).to(device)
@@ -37,11 +40,14 @@ class LSTM(nn.Module):
         embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
 
         if X.dim() == 2:
-            X = X.unsqueeze(1)  # Ensuring it has a channel dimension
+            X = X.unsqueeze(1)  # Adding a channel dimension
 
         X = torch.cat((X, embedded), dim=2).to(self.device)
         
-        lstm_out, _ = self.lstm(X)
+        # Processing through multiple LSTM layers
+        lstm_out, _ = self.lstm1(X)
+        lstm_out, _ = self.lstm2(lstm_out)
+        lstm_out, _ = self.lstm3(lstm_out)
         lstm_out = lstm_out[:, -1, :]  # Taking the output from the last LSTM cell across both directions
 
         X = self.fc1(lstm_out)
