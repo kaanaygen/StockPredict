@@ -19,16 +19,16 @@ class LSTM(nn.Module):
 
         concat_input_size = ticker_embedding_dim + sector_embedding_dim + industry_embedding_dim + num_features
 
-        # Increased complexity with more layers and units
-        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=512, num_layers=3, batch_first=True, dropout=0.1).to(device)
-        self.fc1 = nn.Linear(512, 256).to(device)
-        self.fc2 = nn.Linear(256, 128).to(device)
-        self.fc3 = nn.Linear(128, 64).to(device)
-        self.fc4 = nn.Linear(64, 1).to(device)  # Adding an extra linear layer
+        # Using bidirectional LSTM and more hidden units
+        self.lstm = nn.LSTM(input_size=concat_input_size, hidden_size=512, num_layers=4, batch_first=True, dropout=0.5, bidirectional=True).to(device)
+        self.fc1 = nn.Linear(1024, 512).to(device)  # Adjust for bidirectional output
+        self.fc2 = nn.Linear(512, 256).to(device)
+        self.fc3 = nn.Linear(256, 128).to(device)
+        self.fc4 = nn.Linear(128, 1).to(device)
         self.relu = nn.ReLU().to(device)
-        self.batch_norm1 = nn.BatchNorm1d(256).to(device)
-        self.batch_norm2 = nn.BatchNorm1d(128).to(device)
-        self.batch_norm3 = nn.BatchNorm1d(64).to(device)
+        self.batch_norm1 = nn.BatchNorm1d(512).to(device)
+        self.batch_norm2 = nn.BatchNorm1d(256).to(device)
+        self.batch_norm3 = nn.BatchNorm1d(128).to(device)
 
     def forward(self, X: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
@@ -42,7 +42,7 @@ class LSTM(nn.Module):
         X = torch.cat((X, embedded), dim=2).to(self.device)
         
         lstm_out, _ = self.lstm(X)
-        lstm_out = lstm_out[:, -1, :]  # Taking the output from the last LSTM cell
+        lstm_out = lstm_out[:, -1, :]  # Taking the output from the last LSTM cell across both directions
 
         X = self.fc1(lstm_out)
         X = self.relu(self.batch_norm1(X))
