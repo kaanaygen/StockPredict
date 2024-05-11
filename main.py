@@ -336,5 +336,5 @@ class runLSTMModel:
 
 
 if __name__ == "__main__":
-    model_runner = runnLSTMModel()  
+    model_runner = runLSTMModel()  
     model_runner.run()
