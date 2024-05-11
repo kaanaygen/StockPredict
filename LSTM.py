@@ -38,7 +38,7 @@ class LSTM(nn.Module):
         X_tickers = self.ticker_embedding(X_tickers)
         X_sectors = self.sector_embedding(X_sectors)
         X_industries = self.industry_embedding(X_industries)
-        X = torch.cat([X_features, X_tickers, X_sectors, X_industries], dim=2)  # Ensure dim is correct based on input shape
+        X = torch.cat([X_features, X_tickers, X_sectors, X_industries], dim=1)  
 
         # LSTM output
         lstm_out, _ = self.lstm(X)
