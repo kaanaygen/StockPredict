@@ -59,7 +59,7 @@ class CNN(nn.Module):
         o1 = torch.relu(self.conv1(X))
         o2 = torch.relu(self.conv2(o1))
         o3 = torch.relu(self.conv3(o2))
-        o4 = torch.relu(self.conv3(o3))
+        o4 = torch.relu(self.conv4(o3))
         o4 = self.flatten(o4)
         o5 = torch.relu(self.fully_cnnctd_1(o4))
         o6 = torch.relu(self.fully_cnnctd_2(o5))
