@@ -14,41 +14,69 @@ class DNN(nn.Module):
         sector_embedding_dim = 10
         industry_embedding_dim = 15  
 
-        self.hidden_layers_size = [1024, 512, 384, 288, 216, 162, 128, 64, 32, 1]
-        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
-        self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
-        self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
+        self.hidden_layers_size = [1152, 1024, 896, 768, 640, 512, 384, 256, 128, 64, 32, 16, 1]
+        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
+        self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(device)
+        self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(device)
         concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim 
 
-        self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(concat_input_size, self.hidden_layers_size[0])).to(self.device)
-        self.layers.append(nn.ReLU()).to(self.device)
-
-        for layer in range(1, len(self.hidden_layers_size)):
-            self.layers.append(nn.Linear(self.hidden_layers_size[layer-1], self.hidden_layers_size[layer])).to(self.device)
-            self.layers.append(nn.ReLU()).to(self.device)
-            self.layers.append(nn.Dropout(p=0.3)).to(self.device)
+        # Defining the layers
+        self.layers = nn.ModuleList([
+            nn.Linear(concat_input_size, 1152),
+            nn.LeakyReLU(0.01),
+            nn.Dropout(0.3),  # Initial dropout
+            nn.BatchNorm1d(1152),
+            nn.Linear(1152, 1024),
+            nn.LeakyReLU(0.01),
+            nn.BatchNorm1d(1024),
+            nn.Linear(1024, 896),
+            nn.LeakyReLU(0.01),
+            nn.Dropout(0.2),  # Reduced dropout after initial layers
+            nn.BatchNorm1d(896),
+            nn.Linear(896, 768),
+            nn.LeakyReLU(0.01),
+            nn.BatchNorm1d(768),
+            nn.Linear(768, 640),
+            nn.LeakyReLU(0.01),
+            nn.Linear(640, 512),
+            nn.LeakyReLU(0.01),
+            nn.Linear(512, 384),
+            nn.LeakyReLU(0.01),
+            nn.Linear(384, 256),
+            nn.LeakyReLU(0.01),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.01),
+            nn.Linear(128, 64),
+            nn.LeakyReLU(0.01),
+            nn.Linear(64, 32),
+            nn.LeakyReLU(0.01),
+            nn.Linear(32, 16),
+            nn.LeakyReLU(0.01),
+            nn.Linear(16, 1)
+        ])
         
-        self.layers.append(nn.Linear(self.hidden_layers_size[-1], 1)).to(self.device)
-
+        # Initialize weights
         for layer in self.layers:
             if isinstance(layer, nn.Linear):
                 nn.init.kaiming_normal_(layer.weight)
-
-
+                
+        # Move all layers to the appropriate device
+        self.layers = nn.ModuleList([layer.to(device) for layer in self.layers])
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
-        embedded_tickers = self.ticker_embedding(X_tickers)
-        embedded_sectors = self.sector_embedding(X_sectors)
-        embedded_industries = self.industry_embedding(X_industries)
+        # Embedding layers
+        X_tickers = self.ticker_embedding(X_tickers)
+        X_sectors = self.sector_embedding(X_sectors)
+        X_industries = self.industry_embedding(X_industries)
 
-        combined_input = torch.cat((X_features, embedded_tickers, embedded_sectors, embedded_industries), dim=1)
-        a_i = combined_input
+        # Concatenate all inputs
+        X = torch.cat([X_features, X_tickers, X_sectors, X_industries], dim=1)
+
+        # Pass through all layers
         for layer in self.layers:
-            a_i = layer(a_i)
-        output = a_i
-        return output
+            X = layer(X)
 
+        return X
 
 def train(device: torch.device, model: nn.Module, dataloader: DataLoader, 
           loss_func: nn.MSELoss, optimizer: torch.optim, 
