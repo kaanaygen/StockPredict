@@ -121,7 +121,7 @@ class runCNNModel:
 
     def __init__(self):
         self.batch_size = 1024
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.epochs = 500
     
 
