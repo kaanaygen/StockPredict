@@ -16,23 +16,23 @@ class CNN(nn.Module):
         ticker_embedding_dim = 30
         sector_embedding_dim = 10
         industry_embedding_dim = 15
-        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(self.device)
-        self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(self.device)
-        self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(self.device)
+        self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
+        self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(device)
+        self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(device)
         concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim 
-        self.conv1 = nn.Conv1d(in_channels= 1, out_channels=16, kernel_size=3, stride = 1).to(self.device)
-        self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1).to(self.device)
-        self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1).to(self.device)
+        self.conv1 = nn.Conv1d(in_channels= 1, out_channels=16, kernel_size=3, stride = 1).to(device)
+        self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride = 1).to(device)
+        self.conv3 = nn.Conv1d(in_channels=32, out_channels= 64, kernel_size=3, stride = 1).to(device)
         
         self.flatten = nn.Flatten().to(self.device)
 
-        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size, device=self.device))
+        self.conv_output_size = self.get_conv_output_shape(torch.zeros(1, 1 ,concat_input_size, device=device))
 
-        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512).to(self.device)
-        self.fully_cnnctd_2 = nn.Linear(512, 256).to(self.device)
-        self.fully_cnnctd_3 = nn.Linear(256, 128).to(self.device)
-        self.fully_cnnctd_4 = nn.Linear(128, 64).to(self.device)
-        self.fully_cnnctd_5 = nn.Linear(64, 1).to(self.device)
+        self.fully_cnnctd_1 = nn.Linear(self.conv_output_size, 512).to(device)
+        self.fully_cnnctd_2 = nn.Linear(512, 256).to(device)
+        self.fully_cnnctd_3 = nn.Linear(256, 128).to(device)
+        self.fully_cnnctd_4 = nn.Linear(128, 64).to(device)
+        self.fully_cnnctd_5 = nn.Linear(64, 1).to(device)
 
 
     def get_conv_output_shape(self, x):

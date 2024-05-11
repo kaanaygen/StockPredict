@@ -14,54 +14,31 @@ class DNN(nn.Module):
         sector_embedding_dim = 10
         industry_embedding_dim = 15  
 
-        self.hidden_layers_size = [1152, 1024, 896, 768, 640, 512, 384, 256, 128, 64, 32, 16, 1]
+        self.hidden_layers_size = [5046, 2048, 1792, 1536, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 64, 32, 16, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(device)
         concat_input_size = ticker_embedding_dim + num_features + industry_embedding_dim + sector_embedding_dim 
 
-        # Defining the layers
-        self.layers = nn.ModuleList([
-            nn.Linear(concat_input_size, 1152),
-            nn.LeakyReLU(0.01),
-            nn.Dropout(0.3),  # Initial dropout
-            nn.BatchNorm1d(1152),
-            nn.Linear(1152, 1024),
-            nn.LeakyReLU(0.01),
-            nn.BatchNorm1d(1024),
-            nn.Linear(1024, 896),
-            nn.LeakyReLU(0.01),
-            nn.Dropout(0.2),  # Reduced dropout after initial layers
-            nn.BatchNorm1d(896),
-            nn.Linear(896, 768),
-            nn.LeakyReLU(0.01),
-            nn.BatchNorm1d(768),
-            nn.Linear(768, 640),
-            nn.LeakyReLU(0.01),
-            nn.Linear(640, 512),
-            nn.LeakyReLU(0.01),
-            nn.Linear(512, 384),
-            nn.LeakyReLU(0.01),
-            nn.Linear(384, 256),
-            nn.LeakyReLU(0.01),
-            nn.Linear(256, 128),
-            nn.LeakyReLU(0.01),
-            nn.Linear(128, 64),
-            nn.LeakyReLU(0.01),
-            nn.Linear(64, 32),
-            nn.LeakyReLU(0.01),
-            nn.Linear(32, 16),
-            nn.LeakyReLU(0.01),
-            nn.Linear(16, 1)
-        ])
-        
-        # Initialize weights
+        layers = []
+        input_size = concat_input_size
+        for output_size in hidden_layers_size:
+            layer = nn.Linear(input_size, output_size)
+            layers.append(layer.to(device))
+            if output_size != 1:  # No activation or batch norm after last layer
+                layers.append(nn.LeakyReLU(0.01).to(device))
+                layers.append(nn.BatchNorm1d(output_size).to(device))
+                if output_size > 512 and output_size <= 1024:  # Apply dropout more aggressively in earlier layers
+                    layers.append(nn.Dropout(p=0.1).to(device))
+                if output_size > 1024:  # Apply dropout more aggressively in earlier layers
+                    layers.append(nn.Dropout(p=0.3).to(device))
+
+            input_size = output_size
+
+        self.layers = nn.ModuleList(layers)
         for layer in self.layers:
             if isinstance(layer, nn.Linear):
                 nn.init.kaiming_normal_(layer.weight)
-                
-        # Move all layers to the appropriate device
-        self.layers = nn.ModuleList([layer.to(device) for layer in self.layers])
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         # Embedding layers
