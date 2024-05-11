@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 import torch.optim.lr_scheduler
 
-class ComplexLSTM(nn.Module):
+class LSTM(nn.Module):
     def __init__(self, device, num_tickers, num_sectors, num_industries, num_features):
         super().__init__()
         self.device = device
