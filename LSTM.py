@@ -27,7 +27,7 @@ class LSTM(nn.Module):
         self.batch_norm1 = nn.BatchNorm1d(128).to(device)
         self.batch_norm2 = nn.BatchNorm1d(64).to(device)
 
-    def forward(self, X_features, X_tickers, X_sectors, X_industries):
+    def forward(self, X: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
         embedded_tickers = self.ticker_embedding(X_tickers)
         embedded_sectors = self.sector_embedding(X_sectors)
         embedded_industries = self.industry_embedding(X_industries)
