@@ -12,7 +12,8 @@ import pandas_market_calendars as pmc
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from CNN import CNN 
-from DNN import DNN 
+from DNN import DNN
+from LSTM import LSTM 
 from DNN import train, test_model
 
 class Preprocess:
