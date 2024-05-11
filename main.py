@@ -188,13 +188,12 @@ class runCNNModel:
 
         train(device, self.cnn_model, dataloader_train_set, self.CNN_loss_func, self.CNN_optimizer, self.CNN_scheduler, self.epochs)
         test_model(device, self.cnn_model, dataloader_test_set, self.CNN_loss_func)
-"""
 
 class runDNNModel:
 
     def __init__(self):
         self.batch_size = 1024
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.epochs = 500
     
    
@@ -263,8 +262,8 @@ class runDNNModel:
 
         train(device, self.dnn_model, dataloader_train_set, self.DNN_loss_func, self.DNN_optimizer, self.DNN_scheduler, self.epochs)
         test_model(self.dnn_model, dataloader_test_set, self.DNN_loss_func)
-"""
+
 
 if __name__ == "__main__":
-    model_runner = runCNNModel()  
+    model_runner = runDNNModel()  
     model_runner.run()
