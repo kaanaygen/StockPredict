@@ -412,5 +412,5 @@ class runCNNLSTMModel:
         test_model(device, self.cnn_lstm_model, dataloader_test_set, self.CNN_lstm_loss_func)
 
 if __name__ == "__main__":
-    model_runner = runCNNLSTMModel()  
+    model_runner = runDNNModel()  
     model_runner.run()
