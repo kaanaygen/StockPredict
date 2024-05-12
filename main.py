@@ -341,7 +341,7 @@ class runCNNLSTMModel:
 
     def __init__(self):
         self.batch_size = 1024
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.epochs = 500
     
 
@@ -405,12 +405,12 @@ class runCNNLSTMModel:
         self.cnn_lstm_model = CNN(device, max_ticker_index + 1, max_sector_index + 1, max_industry_index + 1, dataSet.shape[1] - 1).to(device)
         self.CNN_lstm_loss_func = nn.MSELoss()
         self.CNN_lstm_optimizer = optim.Adam(self.cnn_lstm_model.parameters(), lr=self.learning_rate,  weight_decay=1e-5)
-        self.CNN_lstm_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_lstm_optimizer, mode='min', factor=0.9, patience = 2)
+        self.CNN_lstm_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.CNN_lstm_optimizer, mode='min', factor=0.9, patience = 3)
 
 
         train(device, self.cnn_lstm_model, dataloader_train_set, self.CNN_lstm_loss_func,  self.CNN_lstm_optimizer, self.CNN_lstm_scheduler, self.epochs)
         test_model(device, self.cnn_lstm_model, dataloader_test_set, self.CNN_lstm_loss_func)
 
 if __name__ == "__main__":
-    model_runner = runCNNModel()  
+    model_runner = runCNNLSTMModel()  
     model_runner.run()
