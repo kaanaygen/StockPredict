@@ -25,8 +25,8 @@ class CNNLSTM(nn.Module):
 
         # LSTM layers after CNN
         self.lstm1 = nn.LSTM(input_size=64, hidden_size=128, num_layers=4, batch_first=True).to(device)
-        self.lstm2 = nn.LSTM(input_size=128, hidden_size=256, num_layers=2, batch_first=True).to(device)
-        self.lstm3 = nn.LSTM(input_size=256, hidden_size=512, num_layers=1, batch_first=True).to(device)
+        self.lstm2 = nn.LSTM(input_size=128, hidden_size=256, num_layers=8, batch_first=True).to(device)
+        self.lstm3 = nn.LSTM(input_size=256, hidden_size=512, num_layers=16, batch_first=True).to(device)
 
         
         # Fully connected layers
