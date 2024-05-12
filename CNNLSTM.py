@@ -24,8 +24,10 @@ class CNNLSTM(nn.Module):
         self.flatten = nn.Flatten().to(device)
 
         # LSTM layers after CNN
-        self.lstm1 = nn.LSTM(input_size=64, hidden_size=256, num_layers=1, batch_first=True).to(device)
-        self.lstm2 = nn.LSTM(input_size=256, hidden_size=512, num_layers=1, batch_first=True).to(device)
+        self.lstm1 = nn.LSTM(input_size=64, hidden_size=128, num_layers=4, batch_first=True).to(device)
+        self.lstm2 = nn.LSTM(input_size=128, hidden_size=256, num_layers=2, batch_first=True).to(device)
+        self.lstm3 = nn.LSTM(input_size=256, hidden_size=512, num_layers=1, batch_first=True).to(device)
+
         
         # Fully connected layers
         self.fc1 = nn.Linear(512, 512).to(device)
@@ -58,7 +60,8 @@ class CNNLSTM(nn.Module):
 
         # Process through LSTM layers
         lstm_out, _ = self.lstm1(X)
-        lstm_out, _ = self.lstm2(lstm_out)
+        lstm_out, _ = self.lstm2(X)
+        lstm_out, _ = self.lstm3(lstm_out)
         lstm_out = lstm_out[:, -1, :]  # Use only the last LSTM output for prediction
 
         # Process through fully connected layers
