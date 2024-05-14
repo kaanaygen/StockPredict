@@ -53,7 +53,7 @@ class CNN(nn.Module):
         embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
         
         if X.dim() == 2:
-            X = X.unsqueeze(1)  # Adding channel dimension
+            X = X.unsqueeze(1)  
 
         X = torch.cat((X, embedded), dim=2).to(self.device)
         o1 = torch.relu(self.conv1(X))

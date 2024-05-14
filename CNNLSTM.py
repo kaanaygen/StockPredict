@@ -17,19 +17,16 @@ class CNNLSTM(nn.Module):
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(device)
         
-        # CNN layers
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride=1).to(device)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride=1).to(device)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, stride=1).to(device)
         self.flatten = nn.Flatten().to(device)
 
-        # LSTM layers after CNN
         self.lstm1 = nn.LSTM(input_size=64, hidden_size=128, num_layers=8, batch_first=True).to(device)
         self.lstm2 = nn.LSTM(input_size=128, hidden_size=256, num_layers=4, batch_first=True).to(device)
         self.lstm3 = nn.LSTM(input_size=256, hidden_size=512, num_layers=2, batch_first=True).to(device)
 
         
-        # Fully connected layers
         self.fc1 = nn.Linear(512, 512).to(device)
         self.fc2 = nn.Linear(512, 256).to(device)
         self.fc3 = nn.Linear(256, 128).to(device)
@@ -48,23 +45,19 @@ class CNNLSTM(nn.Module):
         embedded_industries = self.industry_embedding(X_industries)
         embedded = torch.cat([embedded_tickers, embedded_sectors, embedded_industries], dim=1).unsqueeze(1)
 
-        # Process through CNN layers
         if X.dim() == 2:
-            X = X.unsqueeze(1)  # Adding channel dimension
-
+            X = X.unsqueeze(1)  
         X = torch.cat((X, embedded), dim=2).to(self.device)
         X = self.relu(self.conv1(X))
         X = self.relu(self.conv2(X))
         X = self.relu(self.conv3(X))
-        X = self.flatten(X).unsqueeze(1)  # Prepare for LSTM with (batch, seq, feature)
+        X = self.flatten(X).unsqueeze(1)  
 
-        # Process through LSTM layers
         lstm_out, _ = self.lstm1(X)
         lstm_out, _ = self.lstm2(X)
         lstm_out, _ = self.lstm3(lstm_out)
-        lstm_out = lstm_out[:, -1, :]  # Use only the last LSTM output for prediction
+        lstm_out = lstm_out[:, -1, :] 
 
-        # Process through fully connected layers
         X = self.fc1(lstm_out)
         X = self.relu(self.batch_norm1(X))
         X = self.fc2(X)

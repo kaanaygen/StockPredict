@@ -14,7 +14,7 @@ class DNN(nn.Module):
         sector_embedding_dim = 10
         industry_embedding_dim = 15  
 
-        hidden_layers_size = [512, 384, 256, 128, 64, 32, 16, 1]
+        hidden_layers_size = [10112, 5048, 2048, 1792, 1536, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 64, 32, 16, 8, 1]
         self.ticker_embedding = nn.Embedding(num_embeddings=num_tickers, embedding_dim=ticker_embedding_dim).to(device)
         self.sector_embedding = nn.Embedding(num_embeddings=num_sectors, embedding_dim=sector_embedding_dim).to(device)
         self.industry_embedding = nn.Embedding(num_embeddings=num_industries, embedding_dim=industry_embedding_dim).to(device)
@@ -25,12 +25,12 @@ class DNN(nn.Module):
         for output_size in hidden_layers_size:
             layer = nn.Linear(input_size, output_size)
             layers.append(layer.to(device))
-            if output_size != 1:  # No activation or batch norm after last layer
+            if output_size != 1: 
                 layers.append(nn.LeakyReLU(0.01).to(device))
                 layers.append(nn.BatchNorm1d(output_size).to(device))
-                if output_size > 512 and output_size <= 1024:  # Apply dropout more aggressively in earlier layers
+                if output_size > 512 and output_size <= 1024:  
                     layers.append(nn.Dropout(p=0.1).to(device))
-                if output_size > 1024:  # Apply dropout more aggressively in earlier layers
+                if output_size > 1024:  
                     layers.append(nn.Dropout(p=0.3).to(device))
 
             input_size = output_size
@@ -41,15 +41,13 @@ class DNN(nn.Module):
                 nn.init.kaiming_normal_(layer.weight)
 
     def forward(self, X_features: torch.Tensor, X_tickers: torch.Tensor, X_sectors: torch.Tensor, X_industries: torch.Tensor) -> torch.Tensor:
-        # Embedding layers
+        
         X_tickers = self.ticker_embedding(X_tickers)
         X_sectors = self.sector_embedding(X_sectors)
         X_industries = self.industry_embedding(X_industries)
 
-        # Concatenate all inputs
         X = torch.cat([X_features, X_tickers, X_sectors, X_industries], dim=1)
 
-        # Pass through all layers
         for layer in self.layers:
             X = layer(X)
 
